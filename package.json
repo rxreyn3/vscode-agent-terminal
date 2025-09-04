@@ -35,10 +35,7 @@
         "command": "codexcli.run",
         "title": "Run Codex CLI",
         "category": "Codex",
-        "icon": {
-          "light": "media/icon-light.svg",
-          "dark": "media/icon-dark.svg"
-        }
+        "icon": "media/command-icon.svg"
       }
     ],
     "menus": {
