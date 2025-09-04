@@ -35,4 +35,4 @@
 
 ## Security & Configuration Tips
 - The command run is user‑configurable (`codexcli.command`). Provide explicit paths when helpful (e.g., `/usr/local/bin/codex --flag`).
-- Multi‑root workspaces: current logic uses the first workspace folder as `cwd`.
+- Multi‑root workspaces: control cwd selection with `codexcli.cwdMode` (`workspaceRoot` | `activeWorkspace` | `activeFileDir` | `prompt`). In `prompt` mode, `codexcli.rememberSelection` can persist the last choice per workspace.

@@ -33,7 +33,7 @@
   - `exitStatus` is set when the shell process exits; attempting to send text will not revive it. Disposal and recreation ensure a valid shell.
   - Keep the terminal name stable to support reuse and predictable behavior.
 
-## 2) Multi-root workspace support
+## ~~2) Multi-root workspace support~~
 
 - Summary: Choose a smarter `cwd` when multiple folders are open or when the active file lies outside a workspace. Adds a `codexcli.cwdMode` setting to control behavior.
 - Modes (`codexcli.cwdMode`):
@@ -89,6 +89,7 @@
 - Notes:
   - Respect remote workspaces: `fsPath` is only valid for `file:` URIs.
   - `prompt` mode UX: display folder names, include full path detail, and handle cancel gracefully.
+  - Implemented via `src/cwd.js`, integrated in `extension.js`, with README and schema updates. Unit and VS Code integration tests added.
 
 ## 3) Command robustness (args + PATH precheck)
 
