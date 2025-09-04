@@ -1,5 +1,5 @@
 **Project Overview**
- - **Project type:** VS Code/Windsurf extension (editor command + toolbar button)
+- **Project type:** VS Code extension (editor command + toolbar button)
 - **Purpose:** Adds an editor title button that opens a terminal in the editor area and runs a configurable Codex CLI command.
 - **Tech stack:** JavaScript (Node-based VS Code Extension Host), VS Code API
 - **Architecture:** Simple command/handler pattern; single activation entry; terminal management and configuration lookup
@@ -82,9 +82,9 @@
 - **Dependencies:** Only the built-in `vscode` API; no third-party packages.
 
 **Environment & Setup**
-- **Prereqs:** VS Code/Windsurf compatible with `^1.75.0` API.
+- **Prereqs:** VS Code compatible with `^1.75.0` API.
 - **Local Development:**
-  - Open folder in VS Code/Windsurf.
+  - Open folder in VS Code.
   - Use “Run Extension” launch config (F5) to open Extension Development Host.
   - Open any text editor; the toolbar icon appears; invoke or use keybinding.
 - **Configuration:**

@@ -1,4 +1,4 @@
-// Minimal VS Code/Windsurf extension in plain JS
+// Minimal VS Code extension in plain JS
 // Adds an editor title button that opens a terminal in the editor
 // area and runs `codex`.
 

@@ -15,6 +15,6 @@ build/**
 **/*.tsx
 
 # Local analysis and planning docs
-codebase_analysis.md
+docs/**
 TODO.md
 

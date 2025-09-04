@@ -1,7 +1,7 @@
 Codex CLI Button
 ================
 
-A tiny VS Code / Windsurf extension that adds an editor title button to launch Codex in a terminal inside the editor area.
+A tiny VS Code extension that adds an editor title button to launch Codex in a terminal inside the editor area.
 
 What it does
 - Adds a "Run Codex CLI" rocket button in the editor title bar.
@@ -14,7 +14,7 @@ Requirements
 - Codex CLI installed and available on your PATH (or set an absolute path via settings).
 
 Install / Run (development)
-1) Open this folder in VS Code / Windsurf.
+1) Open this folder in VS Code.
 2) Press F5 (Run Extension) to launch an Extension Development Host.
 3) Open any file in the Dev Host window. A rocket icon appears at the top‑right of the editor.
 4) Click the button (or use the command palette) to open the terminal and run Codex.
