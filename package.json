@@ -1,0 +1,66 @@
+{
+  "name": "codex-cli-button",
+  "displayName": "Codex CLI Button",
+  "description": "Adds an editor toolbar button that opens a terminal in the editor area and runs codex-cli.",
+  "version": "0.0.1",
+  "publisher": "local",
+  "engines": {
+    "vscode": "^1.75.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "activationEvents": [
+    "onCommand:codexcli.run"
+  ],
+  "main": "./extension.js",
+  "contributes": {
+    "configuration": {
+      "title": "Codex CLI Button",
+      "properties": {
+        "codexcli.command": {
+          "type": "string",
+          "default": "codex",
+          "markdownDescription": "Command to run in the editor terminal (e.g. 'codex --flag')."
+        },
+        "codexcli.preserveEditorFocus": {
+          "type": "boolean",
+          "default": true,
+          "description": "Keep focus in the editor when launching."
+        }
+      }
+    },
+    "commands": [
+      {
+        "command": "codexcli.run",
+        "title": "Run Codex CLI",
+        "category": "Codex",
+        "icon": {
+          "light": "media/icon-light.svg",
+          "dark": "media/icon-dark.svg"
+        }
+      }
+    ],
+    "menus": {
+      "editor/title": [
+        {
+          "command": "codexcli.run",
+          "group": "navigation@100",
+          "when": "editorTextFocus"
+        }
+      ]
+    },
+    "keybindings": [
+      {
+        "command": "codexcli.run",
+        "key": "cmd+shift+.",
+        "when": "editorTextFocus && !terminalFocus"
+      }
+    ]
+  },
+  "icon": "media/icon-256.png",
+  "galleryBanner": {
+    "color": "#111111",
+    "theme": "dark"
+  }
+}
