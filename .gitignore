@@ -3,6 +3,8 @@ node_modules/
 
 # VS Code test downloads
 .vscode-test/
+# Personal VS Code settings (keep launch.json tracked)
+.vscode/settings.json
 
 # Build artifacts / packaging
 dist/
@@ -23,4 +25,3 @@ pnpm-debug.log*
 # Env files
 .env
 .env.*
-
