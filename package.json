@@ -27,6 +27,22 @@
           "type": "boolean",
           "default": true,
           "description": "Keep focus in the editor when launching."
+        },
+        "codexcli.cwdMode": {
+          "type": "string",
+          "default": "workspaceRoot",
+          "enum": [
+            "workspaceRoot",
+            "activeWorkspace",
+            "activeFileDir",
+            "prompt"
+          ],
+          "markdownDescription": "Working directory mode. `workspaceRoot`: first workspace folder. `activeWorkspace`: workspace containing active file. `activeFileDir`: directory of active file. `prompt`: pick a folder when multiple are open."
+        },
+        "codexcli.rememberSelection": {
+          "type": "boolean",
+          "default": true,
+          "description": "When in 'prompt' mode, remember the last selected folder and reuse it."
         }
       }
     },
@@ -59,5 +75,13 @@
   "galleryBanner": {
     "color": "#111111",
     "theme": "dark"
+  },
+  "scripts": {
+    "test": "node test/cwd.test.js",
+    "test:integration": "node test/runTest.js"
+  },
+  "devDependencies": {
+    "@vscode/test-electron": "^2.4.1",
+    "mocha": "^10.4.0"
   }
 }

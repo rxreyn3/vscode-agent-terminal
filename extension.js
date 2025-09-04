@@ -3,6 +3,7 @@
 // area and runs `codex`.
 
 const vscode = require('vscode');
+const { resolveCwd } = require('./src/cwd');
 
 /**
  * @param {vscode.ExtensionContext} context
@@ -13,8 +14,38 @@ function activate(context) {
       const cfg = vscode.workspace.getConfiguration('codexcli');
       const command = cfg.get('command', 'codex');
       const preserveFocus = cfg.get('preserveEditorFocus', true);
+      const mode = cfg.get('cwdMode', 'workspaceRoot');
+      const rememberSelection = cfg.get('rememberSelection', true);
       const folders = vscode.workspace.workspaceFolders || [];
-      const cwd = folders.length ? folders[0].uri.fsPath : undefined;
+
+      const editor = vscode.window.activeTextEditor;
+      const editorUri = editor?.document?.uri;
+      const lastPickedFsPath = context.workspaceState.get('codexcli.lastPickedFsPath');
+      let { cwd, needsPrompt } = resolveCwd({
+        mode,
+        folders,
+        editorUri,
+        rememberSelection,
+        lastPickedFsPath
+      });
+
+      if (mode === 'prompt' && needsPrompt) {
+        const picks = folders.map(f => ({
+          label: f.name || f.uri.fsPath.split(/[\\/]/).pop(),
+          description: f.uri.fsPath,
+          fsPath: f.uri.fsPath
+        }));
+        const pick = await vscode.window.showQuickPick(picks, {
+          placeHolder: 'Select workspace folder for Codex CLI'
+        });
+        if (!pick) {
+          return; // user canceled
+        }
+        cwd = pick.fsPath;
+        if (rememberSelection) {
+          await context.workspaceState.update('codexcli.lastPickedFsPath', cwd);
+        }
+      }
 
       // Reuse an existing terminal if we already created one.
       let term = vscode.window.terminals.find(t => t.name === 'Codex CLI');

@@ -29,9 +29,17 @@ Settings
   - Command to execute in the terminal. Example: `codex --model gpt-5`.
 - `codexcli.preserveEditorFocus` (boolean, default: `true`)
   - Show the terminal but keep focus in the editor.
+- `codexcli.cwdMode` (string, default: `"workspaceRoot"`)
+  - How to choose the working directory:
+    - `workspaceRoot`: use the first workspace folder (default).
+    - `activeWorkspace`: use the workspace containing the active editor’s file.
+    - `activeFileDir`: use the directory of the active file.
+    - `prompt`: when multiple folders are open, prompt to pick one (optionally remembered).
+- `codexcli.rememberSelection` (boolean, default: `true`)
+  - In `prompt` mode, remember the last selected folder and reuse it next time.
 
 Behavior notes
-- Workspace folder: uses the first workspace folder as `cwd` if present; otherwise VS Code’s default terminal location.
+- Workspace folder: chooses `cwd` per `codexcli.cwdMode`. Without a workspace, the terminal launches in the shell’s default location.
 - Terminal reuse: reuses the terminal named "Codex CLI" when alive; recreates it automatically if the shell exited (e.g., after typing `exit`).
 
 Troubleshooting

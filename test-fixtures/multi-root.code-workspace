@@ -1,0 +1,11 @@
+{
+  "folders": [
+    { "path": "A" },
+    { "path": "B" }
+  ],
+  "settings": {
+    "codexcli.cwdMode": "prompt",
+    "codexcli.rememberSelection": true
+  }
+}
+
