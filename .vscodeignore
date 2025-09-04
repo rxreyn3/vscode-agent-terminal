@@ -1,0 +1,20 @@
+# Exclude development-only content from the VSIX package
+.vscode/**
+.github/**
+test/**
+tests/**
+scripts/**
+docs/**
+coverage/**
+dist/**
+build/**
+
+# Source maps / TS sources (if added later)
+**/*.map
+**/*.ts
+**/*.tsx
+
+# Local analysis and planning docs
+codebase_analysis.md
+TODO.md
+
