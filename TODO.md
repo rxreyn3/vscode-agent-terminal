@@ -91,7 +91,7 @@
   - `prompt` mode UX: display folder names, include full path detail, and handle cancel gracefully.
   - Implemented via `src/cwd.js`, integrated in `extension.js`, with README and schema updates. Unit and VS Code integration tests added.
 
-## 3) Command robustness (args + PATH precheck)
+## ~~3) Command robustness (args + PATH precheck)~~
 
 - Summary: Support structured arguments and proactively check whether the base binary exists on PATH before running. Provides reliable quoting and early, friendly errors.
 - Settings additions:
@@ -146,7 +146,7 @@
   - Extension host PATH can differ from the integrated terminal shell PATH (macOS in particular). Treat precheck as a helpful early warning, not a guarantee.
   - Document quoting limitations for PowerShell vs cmd; encourage users to prefer `args` over embedding complex quoting into `command`.
 
-## 4) Status bar action
+## ~~4) Status bar action~~
 
 - Summary: Optional status bar button to trigger `codexcli.run` from anywhere (not just when an editor has focus).
 - Setting:

@@ -11,7 +11,8 @@
     "Other"
   ],
   "activationEvents": [
-    "onCommand:codexcli.run"
+    "onCommand:codexcli.run",
+    "onStartupFinished"
   ],
   "main": "./extension.js",
   "contributes": {
@@ -22,6 +23,17 @@
           "type": "string",
           "default": "codex",
           "markdownDescription": "Command to run in the editor terminal (e.g. 'codex --flag')."
+        },
+        "codexcli.args": {
+          "type": "array",
+          "default": [],
+          "items": { "type": "string" },
+          "markdownDescription": "Optional list of arguments appended after `codexcli.command`. Arguments are quoted appropriately for the platform."
+        },
+        "codexcli.precheckBinary": {
+          "type": "boolean",
+          "default": true,
+          "markdownDescription": "Best-effort check that the base command exists on PATH (or the given absolute path). Shows an error and skips running when not found."
         },
         "codexcli.preserveEditorFocus": {
           "type": "boolean",
@@ -43,6 +55,17 @@
           "type": "boolean",
           "default": true,
           "description": "When in 'prompt' mode, remember the last selected folder and reuse it."
+        },
+        "codexcli.windowsMode": {
+          "type": "string",
+          "default": "block",
+          "enum": ["block", "wsl", "native"],
+          "markdownDescription": "Windows handling for Codex CLI. `block`: show an error (recommended). `wsl`: invoke via `wsl.exe` (runs Linux codex inside WSL). `native`: run as-is (experimental; not officially supported)."
+        },
+        "codexcli.showStatusBar": {
+          "type": "boolean",
+          "default": false,
+          "markdownDescription": "Show a status bar action to run Codex from anywhere. When enabled, a right-side '$(rocket) Codex' button appears and triggers 'codexcli.run'."
         }
       }
     },
@@ -77,11 +100,15 @@
     "theme": "dark"
   },
   "scripts": {
-    "test": "node test/cwd.test.js",
+    "test": "node test/cwd.test.js && node test/command.test.js",
     "test:integration": "node test/runTest.js"
   },
   "devDependencies": {
     "@vscode/test-electron": "^2.4.1",
     "mocha": "^10.4.0"
+  },
+  "dependencies": {
+    "shell-quote": "^1.8.3",
+    "which": "^5.0.0"
   }
 }

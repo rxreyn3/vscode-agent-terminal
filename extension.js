@@ -4,16 +4,46 @@
 
 const vscode = require('vscode');
 const { resolveCwd } = require('./src/cwd');
+const { buildFinalCommand, precheckBinary } = require('./src/command');
+const { resolveWindowsCommand } = require('./src/windows');
 
 /**
  * @param {vscode.ExtensionContext} context
  */
 function activate(context) {
+  // Status bar item lifecycle
+  let statusItem;
+  function refreshStatusBar() {
+    try {
+      const cfg = vscode.workspace.getConfiguration('codexcli');
+      const show = cfg.get('showStatusBar', false);
+      if (show && !statusItem) {
+        statusItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, 1000);
+        statusItem.text = '$(rocket) Codex';
+        statusItem.tooltip = 'Run Codex CLI';
+        statusItem.command = 'codexcli.run';
+        statusItem.show();
+        context.subscriptions.push(statusItem);
+      } else if (!show && statusItem) {
+        try { statusItem.dispose(); } catch (_) { /* ignore */ }
+        statusItem = undefined;
+      } else if (show && statusItem) {
+        statusItem.show();
+      }
+    } catch (e) {
+      // Surface errors but don't crash activation
+      vscode.window.showErrorMessage(`Codex CLI Button (status bar): ${e?.message || e}`);
+    }
+  }
+
   const run = vscode.commands.registerCommand('codexcli.run', async () => {
     try {
       const cfg = vscode.workspace.getConfiguration('codexcli');
-      const command = cfg.get('command', 'codex');
+      let command = cfg.get('command', 'codex');
+      const args = cfg.get('args', []);
+      const precheck = cfg.get('precheckBinary', true);
       const preserveFocus = cfg.get('preserveEditorFocus', true);
+      const windowsMode = cfg.get('windowsMode', 'block');
       const mode = cfg.get('cwdMode', 'workspaceRoot');
       const rememberSelection = cfg.get('rememberSelection', true);
       const folders = vscode.workspace.workspaceFolders || [];
@@ -63,15 +93,57 @@ function activate(context) {
         });
       }
 
+      // Windows gating & command adaptation
+      const isWin = process.platform === 'win32';
+      if (isWin) {
+        const decision = resolveWindowsCommand({
+          platform: process.platform,
+          windowsMode,
+          commandBase: command,
+          args
+        });
+        if (decision.blocked) {
+          vscode.window.showErrorMessage(decision.reason || 'Codex CLI is not officially supported on Windows. Please use WSL or switch windowsMode.');
+          return;
+        }
+        // Apply possible transformation (e.g., wsl.exe codex ...)
+        command = decision.commandBase;
+        // Replace args in place for downstream quoting
+        while (args.length) args.pop();
+        for (const a of decision.args || []) args.push(a);
+      }
+
+      // Build final command with quoted args and optionally precheck the base binary.
+      if (precheck) {
+        const res = precheckBinary({ commandBase: command, isWindows: isWin });
+        if (!res.ok) {
+          vscode.window.showErrorMessage(
+            `Command not found: ${res.base}. Add it to PATH or set an absolute path in codexcli.command.`
+          );
+          return;
+        }
+      }
+
+      const final = buildFinalCommand({ commandBase: command, args, isWindows: isWin });
+
       // Show but keep editor focus (true preserves focus on the editor)
       term.show(preserveFocus);
-      term.sendText(command, true);
+      term.sendText(final, true);
     } catch (err) {
       vscode.window.showErrorMessage(`Codex CLI Button: ${err?.message || err}`);
     }
   });
 
   context.subscriptions.push(run);
+
+  // Initialize and react to setting changes for the optional status bar item
+  refreshStatusBar();
+  const cfgListener = vscode.workspace.onDidChangeConfiguration(e => {
+    if (!e || e.affectsConfiguration('codexcli.showStatusBar') || e.affectsConfiguration('codexcli')) {
+      refreshStatusBar();
+    }
+  });
+  context.subscriptions.push(cfgListener);
 }
 
 function deactivate() {}
