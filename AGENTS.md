@@ -4,7 +4,7 @@
 - Clarify before coding: If a prompt has open questions or ambiguity, ask Ryan specific questions and wait for answers before implementing.
 - Confirm intent to implement: When a request doesn’t clearly ask to start building, confirm whether to proceed before making changes.
 - TDD by default: Practice test‑driven development. Start with a failing test (or update tests to fail), implement the minimal change to pass, then refactor.
-- Update docs after changes: After any meaningful change, review and update relevant docs (README, docs/, and this AGENTS.md) to reflect new behavior or settings.
+- Update docs after changes: After any meaningful change, review and update relevant docs (README and this AGENTS.md) to reflect new behavior or settings.
 - Be proactive and critical: Assume Ryan may not have all constraints in mind. Suggest simpler or safer approaches, call out risks, and recommend small, reviewable steps.
 - Guiding principles: KISS, FOK (Focus on the key), YAGNI, DRY, SRP.
 - Addressing: Address the user as “Ryan” in messages.
@@ -15,7 +15,6 @@
 - `extension.js`: Main entry point referenced by `package.json#main`.
 - `package.json`: VS Code manifest (`contributes`, commands, settings).
 - `media/`: Icons used by the command UI (e.g., `command-icon.svg`).
-- `docs/`: Additional documentation (e.g., `codebase_analysis.md`).
 - `.vscode/launch.json`: “Run Extension” config for the Extension Host.
 - `.vscodeignore`, `.gitignore`: Packaging and repo hygiene.
 
