@@ -22,13 +22,13 @@
         "codexcli.command": {
           "type": "string",
           "default": "codex",
-          "markdownDescription": "Command to run in the editor terminal (e.g. 'codex --flag')."
+          "markdownDescription": "Base command/binary to run (no flags). Add options in `codexcli.args` for reliable quoting. Example: to run `codex -p brain`, set command to `codex` and set args to either a single item `-p brain` or two items `-p` and `brain`."
         },
         "codexcli.args": {
           "type": "array",
           "default": [],
           "items": { "type": "string" },
-          "markdownDescription": "Optional list of arguments appended after `codexcli.command`. Arguments are quoted appropriately for the platform."
+          "markdownDescription": "Optional list of arguments appended after `codexcli.command`. You can add flags and values as two items (e.g. `-p` and `brain`) or as a single item with a space (e.g. `-p brain`). Do not add extra quotes. The extension tokenizes composite items and quotes values appropriately for your platform."
         },
         "codexcli.precheckBinary": {
           "type": "boolean",
@@ -65,7 +65,7 @@
         "codexcli.showStatusBar": {
           "type": "boolean",
           "default": false,
-          "markdownDescription": "Show a status bar action to run Codex from anywhere. When enabled, a right-side '$(rocket) Codex' button appears and triggers 'codexcli.run'."
+          "markdownDescription": "Show a status bar action to run Codex from anywhere. When enabled, a right-side Codex button appears and triggers 'codexcli.run'."
         }
       }
     },

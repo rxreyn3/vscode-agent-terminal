@@ -30,9 +30,9 @@
   - `multi-root.code-workspace`, `A/`, `B/`
 
 **File-By-File Breakdown**
-- `extension.js`: Registers `codexcli.run`. Reads config (`command`, `args`, `precheckBinary`, `windowsMode`, `preserveEditorFocus`, `cwdMode`, `rememberSelection`), computes `cwd` via `resolveCwd`, optionally prompts via QuickPick, persists selection (when enabled), reuses/creates terminal named "Codex CLI" in editor area, builds final command via `buildFinalCommand` (with optional Windows adaptation), and runs it. Disposes exited terminals before recreating. Also hosts an optional status bar item when enabled.
+- `extension.js`: Registers `codexcli.run`. Reads config (`command`, `args`, `precheckBinary`, `windowsMode`, `preserveEditorFocus`, `cwdMode`, `rememberSelection`), computes `cwd` via `resolveCwd`, optionally prompts via QuickPick, persists selection (when enabled), reuses/creates terminal named "Codex CLI" in editor area, builds final command via `buildFinalCommand` (with optional Windows adaptation), and runs it. Disposes exited terminals before recreating. Sends the command only when creating a new terminal to avoid duplicate echoes on subsequent clicks. Also hosts an optional status bar item when enabled.
 - `src/cwd.js`: Pure resolver for cwd selection strategies. Supports `workspaceRoot`, `activeWorkspace`, `activeFileDir`, `prompt` (with remember). Handles non-file URIs and fallbacks.
-- `src/command.js`: Provides `buildFinalCommand` (platform-aware arg quoting) and `precheckBinary` (which/where or fs existence for path-like base).
+- `src/command.js`: Provides `buildFinalCommand` (platform-aware arg quoting) and `precheckBinary` (which/where or fs existence for path-like base). Includes `tokenizeArgs` which splits composite items like `-p brain` into `-p` and `brain` while preserving single-value strings like `my profile` as one argument.
 - `src/windows.js`: Decides Windows behavior: `block` (error), `wsl` (wrap with `wsl.exe`), or `native` (pass-through).
 - `package.json`: Configuration schema includes `codexcli.command`, `codexcli.args`, `codexcli.precheckBinary`, `codexcli.windowsMode`, `codexcli.preserveEditorFocus`, `codexcli.cwdMode`, `codexcli.rememberSelection`, and `codexcli.showStatusBar`. Activation includes `onStartupFinished` to initialize the status bar item.
 
@@ -41,8 +41,8 @@
   - Shown in editor title bar (when `editorTextFocus`), Command Palette, and bound to `cmd+shift+.` by default.
   - Behavior: Opens/reuses terminal "Codex CLI" in editor area, selects cwd via mode, preserves editor focus optionally, sends configured command to shell.
 - **Configuration:**
-  - `codexcli.command: string` — command to execute (default `codex`).
-  - `codexcli.args: string[]` — optional arguments appended and quoted appropriately.
+  - `codexcli.command: string` — base command/binary to execute (default `codex`). Do not include flags; use `codexcli.args` instead.
+  - `codexcli.args: string[]` — optional arguments appended and quoted appropriately. You can add separate items (e.g. `-p` and `brain`) or a single composite item (e.g. `-p brain`); the extension tokenizes composites automatically.
   - `codexcli.precheckBinary: boolean` — best-effort PATH precheck for the base command.
   - `codexcli.preserveEditorFocus: boolean` — keep editor focus on show (default `true`).
   - `codexcli.cwdMode: string` — `workspaceRoot` | `activeWorkspace` | `activeFileDir` | `prompt` (default `workspaceRoot`).
@@ -61,7 +61,7 @@
 **Key Insights**
 - Terminal reuse/dispose is handled; editor focus is preserved by default.
 - Multi-root cwd selection implemented with robust fallbacks and optional persistence.
-- Platform-aware arg quoting and PATH precheck improve robustness.
+- Platform-aware arg quoting and PATH precheck improve robustness. Soft guardrail tip suggests moving flags from `command` to `args` when detected.
 - Windows support is gated with explicit modes; WSL wrapping is available.
 - Optional status bar action enables running without editor focus.
 

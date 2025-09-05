@@ -25,19 +25,74 @@ function quoteArg(arg, isWindows) {
   return "'" + s.replace(/'/g, `'\\''`) + "'";
 }
 
+function isPosixSafeChars(s) {
+  return /^[A-Za-z0-9_@%+=:,./-]+$/.test(s);
+}
+
+function quoteArgPosixMinimal(arg) {
+  const s = String(arg == null ? '' : arg);
+  // Do not quote flags like -p or --profile
+  if (/^-{1,2}[^\s]+$/.test(s)) return s;
+  if (isPosixSafeChars(s)) return s;
+  return "'" + s.replace(/'/g, `'\\''`) + "'";
+}
+
+function tokenizeArgs(inputArgs) {
+  const args = Array.isArray(inputArgs) ? inputArgs : [];
+  const out = [];
+  for (const a of args) {
+    if (a == null) continue;
+    const s = String(a);
+
+    if (shellQuote && typeof shellQuote.parse === 'function' && typeof a === 'string') {
+      const tokens = shellQuote.parse(s).filter(t => typeof t === 'string');
+      if (tokens.length <= 1) {
+        // Keep as a single argument (e.g., value with spaces but no leading flag)
+        if (tokens.length === 1) out.push(tokens[0]); else out.push(s);
+        continue;
+      }
+      if (/^-/.test(tokens[0])) {
+        // Treat first token as the flag; join the remainder back into a single value
+        out.push(tokens[0]);
+        const rest = tokens.slice(1).join(' ').trim();
+        if (rest) out.push(rest);
+        continue;
+      }
+      // Not a leading flag: treat the whole item as a single argument
+      out.push(s);
+      continue;
+    }
+
+    // Fallback without shell-quote: split only once when starting with a flag
+    if (/^-/.test(s) && /\s/.test(s)) {
+      const m = s.match(/^(\S+)\s+([\s\S]+)$/);
+      if (m) {
+        out.push(m[1]);
+        out.push(m[2]);
+        continue;
+      }
+    }
+    out.push(s);
+  }
+  return out;
+}
+
 function buildFinalCommand(options) {
   const commandBase = options && options.commandBase ? options.commandBase : '';
-  const args = options && Array.isArray(options.args) ? options.args : [];
+  const rawArgs = options && Array.isArray(options.args) ? options.args : [];
   const isWindows = !!(options && options.isWindows);
 
-  if (!isWindows && shellQuote && typeof shellQuote.quote === 'function') {
-    // Let shell-quote compose the whole argv for POSIX
-    const argStr = args.length ? shellQuote.quote(args.map(a => String(a))) : '';
-    return [commandBase, argStr].filter(Boolean).join(' ').trim();
+  // Normalize args: split composite items like "-p brain" into tokens
+  const args = tokenizeArgs(rawArgs);
+
+  if (!isWindows) {
+    // POSIX: minimal quoting; avoid quoting flags
+    const quoted = args.map(a => quoteArgPosixMinimal(a));
+    return [commandBase, ...quoted].join(' ').trim();
   }
 
-  // Windows or no library: quote per-arg using our helper
-  const quoted = args.map(a => quoteArg(a, isWindows));
+  // Windows: quote each arg with double quotes
+  const quoted = args.map(a => quoteArg(a, true));
   return [commandBase, ...quoted].join(' ').trim();
 }
 
@@ -85,5 +140,7 @@ function precheckBinary(options) {
 module.exports = {
   quoteArg,
   buildFinalCommand,
+  quoteArgPosixMinimal,
+  tokenizeArgs,
   precheckBinary
 };

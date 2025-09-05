@@ -24,7 +24,8 @@ function run(name, fn) {
 run('buildFinalCommand quotes args (POSIX)', () => {
   assert.ok(cmd, 'src/command.js should be implemented');
   const final = cmd.buildFinalCommand({ commandBase: 'codex', args: ['-p', 'my profile'], isWindows: false });
-  assert.strictEqual(final, "codex '-p' 'my profile'");
+  // Minimal quoting on POSIX: only quote when needed
+  assert.strictEqual(final, "codex -p 'my profile'");
 });
 
 run('buildFinalCommand quotes args (Windows)', () => {
@@ -62,3 +63,14 @@ run('precheckBinary uses fs check for path-based command (missing)', () => {
   assert.strictEqual(res.ok, false);
 });
 
+run('buildFinalCommand tokenizes composite arg (POSIX)', () => {
+  assert.ok(cmd, 'src/command.js should be implemented');
+  const final = cmd.buildFinalCommand({ commandBase: 'codex', args: ['-p brain'], isWindows: false });
+  assert.strictEqual(final, 'codex -p brain');
+});
+
+run('buildFinalCommand tokenizes composite arg (Windows)', () => {
+  assert.ok(cmd, 'src/command.js should be implemented');
+  const final = cmd.buildFinalCommand({ commandBase: 'codex', args: ['-p brain'], isWindows: true });
+  assert.strictEqual(final, 'codex "-p" "brain"');
+});

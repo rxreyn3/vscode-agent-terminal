@@ -48,6 +48,21 @@ function activate(context) {
       const rememberSelection = cfg.get('rememberSelection', true);
       const folders = vscode.workspace.workspaceFolders || [];
 
+      // Soft guardrail: if users include flags in codexcli.command, suggest using args
+      const tipKey = 'codexcli.tip.commandHasFlagsShown';
+      const hasFlagsInCommand = /\s+-{1,2}[^\s]/.test(String(command || ''));
+      if (hasFlagsInCommand && !context.workspaceState.get(tipKey)) {
+        const choice = await vscode.window.showInformationMessage(
+          "Tip: Move flags from 'codexcli.command' into 'codexcli.args' for reliable quoting (e.g., command: 'codex', args: ['-p', 'brain']).",
+          'Open Settings',
+          'Dismiss'
+        );
+        await context.workspaceState.update(tipKey, true);
+        if (choice === 'Open Settings') {
+          try { await vscode.commands.executeCommand('workbench.action.openSettings', 'codexcli'); } catch (_) {}
+        }
+      }
+
       const editor = vscode.window.activeTextEditor;
       const editorUri = editor?.document?.uri;
       const lastPickedFsPath = context.workspaceState.get('codexcli.lastPickedFsPath');
@@ -79,6 +94,7 @@ function activate(context) {
 
       // Reuse an existing terminal if we already created one.
       let term = vscode.window.terminals.find(t => t.name === 'Codex CLI');
+      let created = false;
       // If the terminal process has exited, dispose it so we can recreate fresh.
       if (term && term.exitStatus !== undefined) {
         try { term.dispose(); } catch (_) { /* ignore */ }
@@ -91,6 +107,7 @@ function activate(context) {
           cwd,
           location: { viewColumn: vscode.ViewColumn.Active }
         });
+        created = true;
       }
 
       // Windows gating & command adaptation
@@ -128,7 +145,10 @@ function activate(context) {
 
       // Show but keep editor focus (true preserves focus on the editor)
       term.show(preserveFocus);
-      term.sendText(final, true);
+      // Only send the command when creating a fresh terminal to avoid echoing
+      if (created) {
+        term.sendText(final, true);
+      }
     } catch (err) {
       vscode.window.showErrorMessage(`Codex CLI Button: ${err?.message || err}`);
     }
