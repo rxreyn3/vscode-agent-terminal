@@ -6,7 +6,7 @@ A tiny VS Code extension that adds an editor title button to launch Codex in a t
 What it does
 - Adds a "Run Codex CLI" rocket button in the editor title bar.
 - Opens (or reuses) an editor‑area terminal named "Codex CLI" and runs a configurable command (default: `codex`).
-- Keeps editor focus by default so you can keep typing while Codex runs.
+- Focuses the terminal when launching so you can start typing immediately.
 - Handles closed shells gracefully: if the terminal has exited, it is recreated automatically on the next run.
 
 Requirements
@@ -40,8 +40,6 @@ Settings
   - Best-effort check that the base command exists on PATH (or that an absolute path exists) before running. Shows a friendly error and does not send the command when missing.
 - `codexcli.showStatusBar` (boolean, default: `false`)
   - Show a status bar action (right side) labeled "Codex" that runs `codexcli.run` from anywhere.
-- `codexcli.preserveEditorFocus` (boolean, default: `true`)
-  - Show the terminal but keep focus in the editor.
 - `codexcli.cwdMode` (string, default: `"workspaceRoot"`)
   - How to choose the working directory:
     - `workspaceRoot`: use the first workspace folder (default).

@@ -42,7 +42,6 @@ function activate(context) {
       let command = cfg.get('command', 'codex');
       const args = cfg.get('args', []);
       const precheck = cfg.get('precheckBinary', true);
-      const preserveFocus = cfg.get('preserveEditorFocus', true);
       const windowsMode = cfg.get('windowsMode', 'block');
       const mode = cfg.get('cwdMode', 'workspaceRoot');
       const rememberSelection = cfg.get('rememberSelection', true);
@@ -143,8 +142,8 @@ function activate(context) {
 
       const final = buildFinalCommand({ commandBase: command, args, isWindows: isWin });
 
-      // Show but keep editor focus (true preserves focus on the editor)
-      term.show(preserveFocus);
+      // Always move focus to the Codex terminal when shown
+      term.show(false);
       // Only send the command when creating a fresh terminal to avoid echoing
       if (created) {
         term.sendText(final, true);

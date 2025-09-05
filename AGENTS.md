@@ -40,7 +40,7 @@
   - Status bar action appears when `codexcli.showStatusBar` is true; clicking it triggers the same behavior as the editor button.
   - Terminal named “Codex CLI” opens in the editor area and runs the configured command.
   - Terminal is reused when alive and recreated after exit.
-  - `preserveEditorFocus` behavior: editor keeps focus when launching.
+  - Launch behavior: terminal gains focus when launching.
 - Automated:
   - Unit tests in `test/` (run via `npm test`).
   - VS Code integration test in `test/suite/quickpick.test.js` (run via `npm run test:integration`).

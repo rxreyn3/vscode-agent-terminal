@@ -35,11 +35,6 @@
           "default": true,
           "markdownDescription": "Best-effort check that the base command exists on PATH (or the given absolute path). Shows an error and skips running when not found."
         },
-        "codexcli.preserveEditorFocus": {
-          "type": "boolean",
-          "default": true,
-          "description": "Keep focus in the editor when launching."
-        },
         "codexcli.cwdMode": {
           "type": "string",
           "default": "workspaceRoot",
