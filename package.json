@@ -4,11 +4,28 @@
   "description": "Adds an editor toolbar button that opens a terminal in the editor area and runs codex-cli.",
   "version": "0.0.1",
   "publisher": "local",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/rxreyn3/vscode-codex-cli.git"
+  },
+  "bugs": {
+    "url": "https://github.com/rxreyn3/vscode-codex-cli/issues"
+  },
+  "homepage": "https://github.com/rxreyn3/vscode-codex-cli#readme",
   "engines": {
     "vscode": "^1.75.0"
   },
   "categories": [
     "Other"
+  ],
+  "keywords": [
+    "codex",
+    "cli",
+    "terminal",
+    "toolbar",
+    "button",
+    "wsl"
   ],
   "activationEvents": [
     "onCommand:codexcli.run",
@@ -27,7 +44,9 @@
         "codexcli.args": {
           "type": "array",
           "default": [],
-          "items": { "type": "string" },
+          "items": {
+            "type": "string"
+          },
           "markdownDescription": "Optional list of arguments appended after `codexcli.command`. You can add flags and values as two items (e.g. `-p` and `brain`) or as a single item with a space (e.g. `-p brain`). Do not add extra quotes. The extension tokenizes composite items and quotes values appropriately for your platform."
         },
         "codexcli.precheckBinary": {
@@ -59,7 +78,11 @@
         "codexcli.windowsMode": {
           "type": "string",
           "default": "block",
-          "enum": ["block", "wsl", "native"],
+          "enum": [
+            "block",
+            "wsl",
+            "native"
+          ],
           "markdownDescription": "Windows handling for Codex CLI. `block`: show an error (recommended). `wsl`: invoke via `wsl.exe` (runs Linux codex inside WSL). `native`: run as-is (experimental; not officially supported)."
         },
         "codexcli.showStatusBar": {
@@ -102,11 +125,16 @@
   "scripts": {
     "test:unit": "node test/cwd.test.js && node test/command.test.js && node test/windows.test.js",
     "test:integration": "node test/runTest.js",
-    "test": "npm run -s test:unit && npm run -s test:integration"
+    "test": "npm run -s test:unit && npm run -s test:integration",
+    "vscode:package": "vsce package",
+    "vscode:publish": "vsce publish",
+    "ovsx:publish": "ovsx publish"
   },
   "devDependencies": {
     "@vscode/test-electron": "^2.4.1",
-    "mocha": "^10.4.0"
+    "mocha": "^10.4.0",
+    "ovsx": "^0.8.4",
+    "vsce": "^2.15.0"
   },
   "dependencies": {
     "shell-quote": "^1.8.3",

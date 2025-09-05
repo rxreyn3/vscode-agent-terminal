@@ -72,5 +72,18 @@ Roadmap (high level)
 Contributing
 - Open issues/PRs are welcome. The code is intentionally minimal and written in plain JavaScript for easy hacking.
 
+Publishing
+- Package locally: `npx vsce package` (or `npm run vscode:package`). This produces `codex-cli-button-<version>.vsix`.
+- Install locally: `code --install-extension codex-cli-button-*.vsix`.
+- VS Code Marketplace:
+  - Create a Publisher in the VS Code Marketplace and generate an Azure DevOps PAT with scope "Marketplace: Publish".
+  - Publish: `npx vsce publish -p $VSCE_TOKEN` (or `npm run vscode:publish` after `vsce login <publisher>`).
+- Open VSX:
+  - Create an Open VSX account and token.
+  - Publish: `npx ovsx publish codex-cli-button-*.vsix -p $OVSX_TOKEN` (or `npm run ovsx:publish`).
+- CI/CD:
+  - Tags matching `v*` trigger `.github/workflows/release.yml`: runs tests, packages, uploads the VSIX artifact, and publishes when `VSCE_TOKEN` and/or `OVSX_TOKEN` secrets are present.
+  - Configure repo secrets `VSCE_TOKEN` and `OVSX_TOKEN` to enable publishing.
+
 License
 - MIT — see `LICENSE`.
