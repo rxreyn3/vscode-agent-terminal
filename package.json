@@ -100,8 +100,9 @@
     "theme": "dark"
   },
   "scripts": {
-    "test": "node test/cwd.test.js && node test/command.test.js",
-    "test:integration": "node test/runTest.js"
+    "test:unit": "node test/cwd.test.js && node test/command.test.js && node test/windows.test.js",
+    "test:integration": "node test/runTest.js",
+    "test": "npm run -s test:unit && npm run -s test:integration"
   },
   "devDependencies": {
     "@vscode/test-electron": "^2.4.1",

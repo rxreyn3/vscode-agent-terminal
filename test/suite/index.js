@@ -4,8 +4,10 @@ const path = require('path');
 const Mocha = require('mocha');
 
 function run() {
-  const mocha = new Mocha({ ui: 'bdd', color: true, timeout: 20000 });
+  const mocha = new Mocha({ ui: 'bdd', color: true, timeout: 30000 });
+  // Load all integration test files
   mocha.addFile(path.resolve(__dirname, 'quickpick.test.js'));
+  mocha.addFile(path.resolve(__dirname, 'basic.test.js'));
 
   return new Promise((resolve, reject) => {
     try {
@@ -23,4 +25,3 @@ function run() {
 }
 
 module.exports = { run };
-

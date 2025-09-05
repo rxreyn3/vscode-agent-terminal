@@ -20,22 +20,21 @@
 
 - Summary: Allow customizing the terminal’s name to support multiple Codex terminals (e.g., native vs WSL) and personal preference.
 
-## 6) Testing: basic VS Code extension tests
+## ~~6) Testing: basic VS Code extension tests~~
 
-- Summary: Add minimal integration tests to validate command registration, terminal lifecycle handling, and cwd resolution using `@vscode/test-electron` (vscode-test) + Mocha.
-- Scope:
-  - Test that `codexcli.run` is registered and callable.
-  - Test terminal reuse and recreation after exit (`exitStatus` handling).
-  - Test multi-root cwd resolution for each `cwdMode` (mock workspace or use fixture folders).
-- Tasks:
-  - Add dev dependencies: `@vscode/test-electron`, `mocha`, `chai` (or Node assert).
-  - Create `src/test/suite/extension.test.js` with tests that activate the extension and call the command.
-  - Add `scripts.test` to `package.json` to run the tests via `vscode-test` download + launch.
-  - Provide a minimal test workspace under `test-fixtures/` (single and multi-root) for cwd tests.
-- Acceptance criteria:
-  - `pnpm test`/`npm test` downloads the correct VS Code version and runs tests headlessly.
-  - All tests pass locally on macOS/Linux; Windows runs are best-effort due to platform nuances.
-  - CI-ready with a future GitHub Actions job.
+- Summary: Integration tests added to validate command registration, terminal lifecycle handling, and cwd resolution using `@vscode/test-electron` + Mocha.
+- Scope covered:
+  - Verified `codexcli.run` is registered and callable.
+  - Verified terminal recreation after `exitStatus` is set, and that the command sends once on fresh terminal.
+  - Verified cwd resolution for `workspaceRoot`, `activeWorkspace`, and `activeFileDir` against a multi-root workspace fixture.
+- Changes:
+  - New tests in `test/suite/basic.test.js`; existing `quickpick.test.js` retained.
+  - Test runner pins VS Code version based on `engines.vscode`.
+  - `npm test` runs both unit and integration tests (`test:unit` + `test:integration`).
+  - Added fixture file `test-fixtures/B/src/index.txt` for `activeFileDir` testing.
+- Acceptance:
+  - `npm test` downloads the VS Code version matching `engines.vscode` and runs headlessly.
+  - Tests pass locally on macOS/Linux; Windows remains best-effort.
 
 ## 7) CI/CD + Publishing (VS Code + Open VSX)
 

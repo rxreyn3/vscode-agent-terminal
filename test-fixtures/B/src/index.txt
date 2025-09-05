@@ -1,0 +1,2 @@
+This is a nested file used by integration tests to validate the activeFileDir mode.
+
