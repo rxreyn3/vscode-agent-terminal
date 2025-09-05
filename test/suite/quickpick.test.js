@@ -56,4 +56,112 @@ describe('QuickPick cwd prompt', function() {
       vscode.window.createTerminal = originalCreateTerminal;
     }
   });
+
+  it('uses configured terminalName when creating a terminal', async function() {
+    const ext = vscode.extensions.getExtension('local.codex-cli-button');
+    assert.ok(ext, 'Extension should be found');
+
+    const cfg = vscode.workspace.getConfiguration('codexcli');
+    await cfg.update('cwdMode', 'workspaceRoot', vscode.ConfigurationTarget.Workspace);
+    await cfg.update('precheckBinary', false, vscode.ConfigurationTarget.Workspace);
+    await cfg.update('terminalName', 'My Codex', vscode.ConfigurationTarget.Workspace);
+
+    let capturedName = undefined;
+    const originalCreateTerminal = vscode.window.createTerminal;
+    vscode.window.createTerminal = (options) => {
+      capturedName = options && options.name;
+      return {
+        name: options && options.name || 'Codex CLI',
+        exitStatus: undefined,
+        show: () => {},
+        sendText: () => {},
+        dispose: () => {}
+      };
+    };
+
+    try {
+      await vscode.commands.executeCommand('codexcli.run');
+      assert.strictEqual(capturedName, 'My Codex');
+    } finally {
+      vscode.window.createTerminal = originalCreateTerminal;
+    }
+  });
+
+  it('reuses existing terminal matching terminalName (no duplicate create)', async function() {
+    const ext = vscode.extensions.getExtension('local.codex-cli-button');
+    assert.ok(ext, 'Extension should be found');
+
+    const cfg = vscode.workspace.getConfiguration('codexcli');
+    await cfg.update('cwdMode', 'workspaceRoot', vscode.ConfigurationTarget.Workspace);
+    await cfg.update('precheckBinary', false, vscode.ConfigurationTarget.Workspace);
+    await cfg.update('terminalName', 'Reuse Codex', vscode.ConfigurationTarget.Workspace);
+
+    // Fake existing terminal with matching name
+    let showCalls = 0;
+    const fakeTerm = {
+      name: 'Reuse Codex',
+      exitStatus: undefined,
+      show: () => { showCalls++; },
+      sendText: () => {},
+      dispose: () => {}
+    };
+
+    // Patch window.terminals getter to return our fake terminal
+    const originalDescriptor = Object.getOwnPropertyDescriptor(vscode.window, 'terminals');
+    Object.defineProperty(vscode.window, 'terminals', {
+      configurable: true,
+      get() { return [fakeTerm]; }
+    });
+
+    // Stub createTerminal to detect any unintended creation
+    let createCalls = 0;
+    const originalCreateTerminal = vscode.window.createTerminal;
+    vscode.window.createTerminal = (options) => {
+      createCalls++;
+      return fakeTerm;
+    };
+
+    try {
+      await vscode.commands.executeCommand('codexcli.run');
+      assert.strictEqual(createCalls, 0, 'Should not create a new terminal when one matches by name');
+      assert.ok(showCalls > 0, 'Existing terminal should be shown');
+    } finally {
+      // Restore stubs
+      vscode.window.createTerminal = originalCreateTerminal;
+      if (originalDescriptor) {
+        Object.defineProperty(vscode.window, 'terminals', originalDescriptor);
+      }
+    }
+  });
+
+  it('sets terminal icon to media/command-icon.svg', async function() {
+    const ext = vscode.extensions.getExtension('local.codex-cli-button');
+    assert.ok(ext, 'Extension should be found');
+
+    const cfg = vscode.workspace.getConfiguration('codexcli');
+    await cfg.update('cwdMode', 'workspaceRoot', vscode.ConfigurationTarget.Workspace);
+    await cfg.update('precheckBinary', false, vscode.ConfigurationTarget.Workspace);
+
+    let capturedIcon = undefined;
+    const originalCreateTerminal = vscode.window.createTerminal;
+    vscode.window.createTerminal = (options) => {
+      capturedIcon = options && options.iconPath;
+      return {
+        name: (options && options.name) || 'Codex CLI',
+        exitStatus: undefined,
+        show: () => {},
+        sendText: () => {},
+        dispose: () => {}
+      };
+    };
+
+    try {
+      await vscode.commands.executeCommand('codexcli.run');
+      assert.ok(capturedIcon, 'iconPath should be set');
+      const asString = String(capturedIcon);
+      assert.ok(asString.includes('media/command-icon.svg'), 'iconPath should point to media/command-icon.svg');
+    } finally {
+      vscode.window.createTerminal = originalCreateTerminal;
+    }
+  });
 });

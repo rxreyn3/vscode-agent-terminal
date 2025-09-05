@@ -45,7 +45,10 @@ function activate(context) {
       const windowsMode = cfg.get('windowsMode', 'block');
       const mode = cfg.get('cwdMode', 'workspaceRoot');
       const rememberSelection = cfg.get('rememberSelection', true);
+      const cfgTerminalName = cfg.get('terminalName', 'Codex CLI');
+      const terminalName = String(cfgTerminalName || '').trim() || 'Codex CLI';
       const folders = vscode.workspace.workspaceFolders || [];
+      const iconUri = vscode.Uri.joinPath(context.extensionUri, 'media', 'command-icon.svg');
 
       // Soft guardrail: if users include flags in codexcli.command, suggest using args
       const tipKey = 'codexcli.tip.commandHasFlagsShown';
@@ -92,7 +95,7 @@ function activate(context) {
       }
 
       // Reuse an existing terminal if we already created one.
-      let term = vscode.window.terminals.find(t => t.name === 'Codex CLI');
+      let term = vscode.window.terminals.find(t => t.name === terminalName);
       let created = false;
       // If the terminal process has exited, dispose it so we can recreate fresh.
       if (term && term.exitStatus !== undefined) {
@@ -102,9 +105,10 @@ function activate(context) {
       if (!term) {
         // Force terminal into the editor area by specifying a viewColumn.
         term = vscode.window.createTerminal({
-          name: 'Codex CLI',
+          name: terminalName,
           cwd,
-          location: { viewColumn: vscode.ViewColumn.Active }
+          location: { viewColumn: vscode.ViewColumn.Active },
+          iconPath: iconUri
         });
         created = true;
       }

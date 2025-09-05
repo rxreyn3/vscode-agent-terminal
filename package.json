@@ -51,6 +51,11 @@
           "default": true,
           "description": "When in 'prompt' mode, remember the last selected folder and reuse it."
         },
+        "codexcli.terminalName": {
+          "type": "string",
+          "default": "Codex CLI",
+          "markdownDescription": "Name of the terminal used by Codex CLI Button. Change to customize the label or to run multiple Codex terminals side-by-side. Existing terminals are not renamed."
+        },
         "codexcli.windowsMode": {
           "type": "string",
           "default": "block",

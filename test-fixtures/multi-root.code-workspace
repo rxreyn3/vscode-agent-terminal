@@ -4,8 +4,10 @@
     { "path": "B" }
   ],
   "settings": {
-    "codexcli.cwdMode": "prompt",
-    "codexcli.rememberSelection": true
+    "codexcli.cwdMode": "workspaceRoot",
+    "codexcli.rememberSelection": true,
+    "codexcli.precheckBinary": false,
+    "codexcli.terminalName": "Reuse Codex"
   }
 }
 

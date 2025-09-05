@@ -40,6 +40,8 @@ Settings
   - Best-effort check that the base command exists on PATH (or that an absolute path exists) before running. Shows a friendly error and does not send the command when missing.
 - `codexcli.showStatusBar` (boolean, default: `false`)
   - Show a status bar action (right side) labeled "Codex" that runs `codexcli.run` from anywhere.
+- `codexcli.terminalName` (string, default: `"Codex CLI"`)
+  - Name of the terminal used for running Codex. Change to customize the label or to keep multiple Codex terminals (e.g., different profiles). Existing terminals are not renamed when you change this setting.
 - `codexcli.cwdMode` (string, default: `"workspaceRoot"`)
   - How to choose the working directory:
     - `workspaceRoot`: use the first workspace folder (default).
@@ -49,9 +51,9 @@ Settings
 - `codexcli.rememberSelection` (boolean, default: `true`)
   - In `prompt` mode, remember the last selected folder and reuse it next time.
 
-Behavior notes
+ Behavior notes
 - Workspace folder: chooses `cwd` per `codexcli.cwdMode`. Without a workspace, the terminal launches in the shell’s default location.
-- Terminal reuse: reuses the terminal named "Codex CLI" when alive; recreates it automatically if the shell exited (e.g., after typing `exit`).
+- Terminal reuse: reuses the terminal matching `codexcli.terminalName` when alive; recreates it automatically if the shell exited (e.g., after typing `exit`).
  - Send behavior: the command is sent only when creating a new terminal; clicking the button again focuses the existing terminal without re-sending. Close the terminal (or type `exit`) to run again.
  - Args assembly: the final command sent is `<codexcli.command> <quoted args...>` with quoting rules suited to your OS. Prefer `codexcli.args` over embedding complex quoting in `codexcli.command`. Composite items like `-p brain` are tokenized to `-p` and `brain` automatically.
  - PATH precheck: the extension host’s PATH can differ from your terminal’s PATH (especially on macOS). The precheck is an early warning only; if it reports missing but you know it exists in your shell, you can disable the check by setting `codexcli.precheckBinary` to `false`.

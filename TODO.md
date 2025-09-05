@@ -16,22 +16,9 @@
 
 - Summary: Optional status bar button to trigger `codexcli.run` from anywhere (not just when an editor has focus).
 
-## 5) Config schema: terminal name
+## ~~5) Config schema: terminal name~~
 
 - Summary: Allow customizing the terminal’s name to support multiple Codex terminals (e.g., native vs WSL) and personal preference.
-- Setting addition:
-  - `codexcli.terminalName: string` (default `"Codex CLI"`) — label used when finding/creating the terminal.
-- Behavior:
-  - Search for an existing terminal matching `terminalName` and reuse it; otherwise create a new one with that name.
-  - Changing the setting does not rename existing terminals; new runs will create/reuse by the new name.
-- Tasks:
-  - Add config property in `package.json` under `contributes.configuration` with description.
-  - Read `terminalName` in the command handler; replace hardcoded occurrences.
-  - Optional: If a terminal exists with the old default name and the user changes the setting, allow both terminals to coexist (no forced rename) to keep behavior predictable.
-- Acceptance criteria:
-  - Default behavior unchanged (still uses "Codex CLI").
-  - When `codexcli.terminalName` is set, newly created terminal labels reflect the value and reuse works by that name without creating duplicates.
-  - No regressions to focus behavior (terminal gains focus), cwd selection, or status bar behavior.
 
 ## 6) Testing: basic VS Code extension tests
 
