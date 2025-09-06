@@ -13,10 +13,33 @@
 
 ## Project Structure & Module Organization
 - `src/extension.ts`: Main entry point (compiled to `out/extension.js`, referenced by `package.json#main`).
+- `src/command.ts` → `out/command.js`: Arg quoting + PATH precheck helpers.
+- `src/windows.ts` → `out/windows.js`: Windows handling (`block`/`wsl`/`native`).
+- `src/cwd.ts` → `out/cwd.js`: Workspace cwd resolution helpers.
 - `package.json`: VS Code manifest (`contributes`, commands, settings).
 - `media/`: Icons used by the command UI (e.g., `command-icon.svg`).
 - `.vscode/launch.json`: “Run Extension” config for the Extension Host.
 - `.vscodeignore`, `.gitignore`: Packaging and repo hygiene.
+
+### Architecture (Flow)
+```
+[User Action: editor button / keybinding / status bar]
+                      |
+                      v
+                src/extension.ts
+                      |
+           +----------+-----------+
+           |                      |
+       resolveCwd             resolveWindowsCommand
+        (src/cwd.ts)             (src/windows.ts)
+           |                      |
+           +----------+-----------+
+                      |
+   precheckBinary + buildFinalCommand (src/command.ts)
+                      |
+            VS Code Terminal (create/reuse)
+               └─ sendText on first creation only
+```
 
 ## Build, Test, and Development Commands
 - Run (dev): Open in VS Code → Run and Debug → “Run Extension” or press `F5` (preLaunch compiles TypeScript to `out/`).
@@ -26,6 +49,8 @@
 - Install local: `code --install-extension codex-cli-button-*.vsix`.
 - Publish (optional): `vsce publish` (requires configured `publisher`).
 - Notes: All core modules are in TypeScript. Minimal deps (`shell-quote`, `which`) for quoting and PATH checks.
+
+Notes (tests): Unit/integration tests import from `out/*.js`. The `pretest` script compiles TS before running tests.
 
 ## Coding Style & Naming Conventions
 - Language: TypeScript for the entry; plain JS allowed for helpers. Two‑space indent, single quotes, semicolons.
@@ -44,6 +69,11 @@
   - Unit tests in `test/` (run via `npm test`).
   - VS Code integration test in `test/suite/quickpick.test.js` (run via `npm run test:integration`).
 
+## Functional Constraints
+- Do not resend the command when the terminal is already alive. `sendText` is invoked only when creating a new terminal instance. Subsequent invocations focus/reuse the terminal without re-sending.
+- Terminal focus: launching focuses the terminal (no “preserve editor focus” option at this time).
+- Windows: functionality is sufficient for now (`block` default, with `wsl` and `native` available). No further Windows work is prioritized.
+
 ## Commit & Pull Request Guidelines
 - Commits: Short, imperative subject; add a brief body when needed (e.g., “Improve README: features, usage, troubleshooting”).
 - PRs: Include what/why, testing steps, and any screenshots/GIFs of the editor title button and terminal behavior. Link related issues and update README/settings docs when adding commands or configuration.
@@ -56,7 +86,10 @@
 - Multi‑root workspaces: control cwd selection with `codexcli.cwdMode` (`workspaceRoot` | `activeWorkspace` | `activeFileDir` | `prompt`). In `prompt` mode, `codexcli.rememberSelection` can persist the last choice per workspace.
 
 ## Project Structure & Modules (additions)
-- `src/command.js`: Arg quoting and PATH precheck helpers (`buildFinalCommand`, `precheckBinary`).
-- `src/windows.js`: Windows handling (`block`/`wsl`/`native`) for `codex` invocation.
-- `test/command.test.js`: Unit tests for quoting and precheck.
-- `test/windows.test.js`: Unit tests for Windows command resolution.
+- `src/command.ts` → `out/command.js`: Arg quoting and PATH precheck helpers (`buildFinalCommand`, `precheckBinary`).
+- `src/windows.ts` → `out/windows.js`: Windows handling (`block`/`wsl`/`native`) for `codex` invocation.
+- `src/cwd.ts` → `out/cwd.js`: CWD resolution modes (`workspaceRoot`, `activeWorkspace`, `activeFileDir`, `prompt`).
+- Tests: `test/command.test.js`, `test/windows.test.js`, and integration tests under `test/suite/`.
+
+## Potential Enhancements (for discussion)
+- Profiles: named command+args presets selectable via QuickPick (optionally remember last profile per workspace).
