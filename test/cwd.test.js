@@ -4,8 +4,8 @@ const assert = require('assert');
 const path = require('path');
 
 // Intentionally import a module that does not exist yet to start with failing tests (TDD).
-// The implementation will be added in src/cwd.js.
-const { resolveCwd } = require('../src/cwd.js');
+// The implementation is compiled to out/cwd.js.
+const { resolveCwd } = require('../out/cwd.js');
 
 function makeFolder(p, name) {
   return { name, uri: { scheme: 'file', fsPath: path.resolve(p) } };
@@ -65,4 +65,3 @@ run('activeFileDir falls back to first folder for untitled', () => {
   const { cwd } = resolveCwd({ mode: 'activeFileDir', folders, editorUri });
   assert.strictEqual(cwd, path.resolve(rootA));
 });
-

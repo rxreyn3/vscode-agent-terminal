@@ -4,7 +4,7 @@ const assert = require('assert');
 
 let win;
 try {
-  win = require('../src/windows');
+  win = require('../out/windows.js');
 } catch (e) {
   // leave undefined to make tests fail until implemented
 }
@@ -55,4 +55,3 @@ run('wsl mode wraps base into wsl.exe and prepends original base to args', () =>
   assert.strictEqual(res.commandBase.toLowerCase(), 'wsl.exe');
   assert.deepStrictEqual(res.args, ['codex', '-p', 'abc']);
 });
-

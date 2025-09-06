@@ -1,17 +1,16 @@
-'use strict';
+import * as path from 'path';
 
-const path = require('path');
-
-function tryRequire(name) {
-  try { return require(name); } catch (_) { return null; }
+function tryRequire(name: string): any {
+  // eslint-disable-next-line @typescript-eslint/no-var-requires
+  try { return require(name); } catch { return null; }
 }
 
 // Prefer libraries when available, but keep robust fallbacks so tests and
 // offline environments continue to work.
-const whichLib = tryRequire('which');
-const shellQuote = tryRequire('shell-quote');
+const whichLib: any = tryRequire('which');
+const shellQuote: any = tryRequire('shell-quote');
 
-function quoteArg(arg, isWindows) {
+export function quoteArg(arg: unknown, isWindows: boolean): string {
   const s = String(arg == null ? '' : arg);
   if (isWindows) {
     // Windows: wrap in double quotes and escape embedded quotes
@@ -25,11 +24,11 @@ function quoteArg(arg, isWindows) {
   return "'" + s.replace(/'/g, `'\\''`) + "'";
 }
 
-function isPosixSafeChars(s) {
+function isPosixSafeChars(s: string): boolean {
   return /^[A-Za-z0-9_@%+=:,./-]+$/.test(s);
 }
 
-function quoteArgPosixMinimal(arg) {
+export function quoteArgPosixMinimal(arg: unknown): string {
   const s = String(arg == null ? '' : arg);
   // Do not quote flags like -p or --profile
   if (/^-{1,2}[^\s]+$/.test(s)) return s;
@@ -37,15 +36,15 @@ function quoteArgPosixMinimal(arg) {
   return "'" + s.replace(/'/g, `'\\''`) + "'";
 }
 
-function tokenizeArgs(inputArgs) {
+export function tokenizeArgs(inputArgs: unknown[]): string[] {
   const args = Array.isArray(inputArgs) ? inputArgs : [];
-  const out = [];
+  const out: string[] = [];
   for (const a of args) {
     if (a == null) continue;
     const s = String(a);
 
     if (shellQuote && typeof shellQuote.parse === 'function' && typeof a === 'string') {
-      const tokens = shellQuote.parse(s).filter(t => typeof t === 'string');
+      const tokens = shellQuote.parse(s).filter((t: unknown) => typeof t === 'string');
       if (tokens.length <= 1) {
         // Keep as a single argument (e.g., value with spaces but no leading flag)
         if (tokens.length === 1) out.push(tokens[0]); else out.push(s);
@@ -77,7 +76,7 @@ function tokenizeArgs(inputArgs) {
   return out;
 }
 
-function buildFinalCommand(options) {
+export function buildFinalCommand(options?: { commandBase?: string; args?: unknown[]; isWindows?: boolean }): string {
   const commandBase = options && options.commandBase ? options.commandBase : '';
   const rawArgs = options && Array.isArray(options.args) ? options.args : [];
   const isWindows = !!(options && options.isWindows);
@@ -96,7 +95,7 @@ function buildFinalCommand(options) {
   return [commandBase, ...quoted].join(' ').trim();
 }
 
-function isPathLike(base) {
+function isPathLike(base: string): boolean {
   if (!base) return false;
   if (path.isAbsolute(base)) return true;
   if (base.includes('/') || base.includes('\\')) return true;
@@ -105,10 +104,18 @@ function isPathLike(base) {
   return false;
 }
 
-function precheckBinary(options) {
+export function precheckBinary(options: {
+  commandBase?: string;
+  isWindows?: boolean;
+  spawnSync?: (command: string, opts: any) => { status: number | null } | any;
+  fs?: { existsSync?: (p: string) => boolean } | any;
+  which?: { sync?: (cmd: string, opts?: any) => string | null } | any;
+}): { ok: boolean; base: string } {
   const commandBase = options && options.commandBase ? options.commandBase : '';
   const isWindows = !!(options && options.isWindows);
+  // eslint-disable-next-line @typescript-eslint/no-var-requires
   const spawnSync = (options && options.spawnSync) || require('child_process').spawnSync;
+  // eslint-disable-next-line @typescript-eslint/no-var-requires
   const fs = (options && options.fs) || require('fs');
   const which = (options && options.which) || whichLib;
 
@@ -135,7 +142,7 @@ function precheckBinary(options) {
     try {
       const resolved = which.sync(base, { nothrow: true });
       return { ok: !!resolved, base };
-    } catch (_) {
+    } catch {
       return { ok: false, base };
     }
   }
@@ -145,10 +152,11 @@ function precheckBinary(options) {
   return { ok: res && res.status === 0, base };
 }
 
-module.exports = {
+export default {
   quoteArg,
   buildFinalCommand,
   quoteArgPosixMinimal,
   tokenizeArgs,
   precheckBinary
 };
+

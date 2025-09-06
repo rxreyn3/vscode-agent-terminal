@@ -1,14 +1,14 @@
 'use strict';
 
-const path = require('path');
+import * as path from 'path';
 
-function normalize(p) {
+function normalize(p?: string): string | undefined {
   if (!p) return undefined;
   const r = path.resolve(p);
   return process.platform === 'win32' ? r.toLowerCase() : r;
 }
 
-function isWithin(filePath, folderPath) {
+function isWithin(filePath?: string, folderPath?: string): boolean {
   if (!filePath || !folderPath) return false;
   const f = normalize(filePath);
   const d = normalize(folderPath);
@@ -18,13 +18,16 @@ function isWithin(filePath, folderPath) {
   return f.startsWith(withSep);
 }
 
-function firstFolderFsPath(folders) {
+function firstFolderFsPath(folders?: Array<{ uri: { fsPath: string } }>): string | undefined {
   return folders && folders[0] && folders[0].uri && folders[0].uri.fsPath;
 }
 
-function findFolderForFile(folders, fileFsPath) {
+function findFolderForFile(
+  folders: Array<{ uri: { fsPath: string } }> | undefined,
+  fileFsPath?: string
+): string | undefined {
   if (!folders || !fileFsPath) return undefined;
-  let match = undefined;
+  let match: string | undefined = undefined;
   for (const f of folders) {
     const dir = f && f.uri && f.uri.fsPath;
     if (dir && isWithin(fileFsPath, dir)) {
@@ -36,37 +39,35 @@ function findFolderForFile(folders, fileFsPath) {
   return match;
 }
 
-// Resolve cwd given a mode and context-like inputs.
-// Options:
-// - mode: 'workspaceRoot' | 'activeWorkspace' | 'activeFileDir' | 'prompt'
-// - folders: array of { uri: { scheme, fsPath } }
-// - editorUri: { scheme, fsPath } | undefined
-// - rememberSelection: boolean
-// - lastPickedFsPath: string | undefined
-// Returns: { cwd: string | undefined, needsPrompt: boolean }
-function resolveCwd(options) {
+export function resolveCwd(options?: {
+  mode?: 'workspaceRoot' | 'activeWorkspace' | 'activeFileDir' | 'prompt';
+  folders?: Array<{ name?: string; uri: { scheme: string; fsPath: string } }>;
+  editorUri?: { scheme: string; fsPath?: string } | undefined;
+  rememberSelection?: boolean;
+  lastPickedFsPath?: string;
+}): { cwd: string | undefined; needsPrompt: boolean } {
   const mode = options && options.mode ? options.mode : 'workspaceRoot';
   const folders = options && options.folders ? options.folders : [];
   const editorUri = options && options.editorUri ? options.editorUri : undefined;
   const rememberSelection = options && typeof options.rememberSelection === 'boolean' ? options.rememberSelection : true;
   const lastPickedFsPath = options && options.lastPickedFsPath ? options.lastPickedFsPath : undefined;
 
-  const first = firstFolderFsPath(folders);
+  const first = firstFolderFsPath(folders as any);
 
   switch (mode) {
     case 'activeWorkspace': {
       const fileFsPath = editorUri && editorUri.scheme === 'file' ? editorUri.fsPath : undefined;
-      const match = fileFsPath ? findFolderForFile(folders, fileFsPath) : undefined;
-      return { cwd: match || first, needsPrompt: false };
+      const match = fileFsPath ? findFolderForFile(folders as any, fileFsPath) : undefined;
+      return { cwd: match || (first as any), needsPrompt: false };
     }
     case 'activeFileDir': {
       const fileFsPath = editorUri && editorUri.scheme === 'file' ? editorUri.fsPath : undefined;
       const dir = fileFsPath ? path.dirname(fileFsPath) : undefined;
-      return { cwd: dir || first, needsPrompt: false };
+      return { cwd: dir || (first as any), needsPrompt: false };
     }
     case 'prompt': {
       if ((folders && folders.length) <= 1) {
-        return { cwd: first, needsPrompt: false };
+        return { cwd: (first as any), needsPrompt: false };
       }
       if (rememberSelection && lastPickedFsPath) {
         // Only reuse last selection if it still matches one of the open folders
@@ -79,12 +80,10 @@ function resolveCwd(options) {
     }
     case 'workspaceRoot':
     default: {
-      return { cwd: first, needsPrompt: false };
+      return { cwd: (first as any), needsPrompt: false };
     }
   }
 }
 
-module.exports = {
-  resolveCwd
-};
+export default { resolveCwd };
 

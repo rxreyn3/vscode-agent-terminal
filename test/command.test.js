@@ -5,7 +5,7 @@ const assert = require('assert');
 // Start TDD: import a module that does not exist yet
 let cmd;
 try {
-  cmd = require('../src/command.js');
+  cmd = require('../out/command.js');
 } catch (e) {
   // Leave cmd undefined; tests that reference it will fail until implemented
 }
