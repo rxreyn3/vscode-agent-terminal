@@ -25,7 +25,7 @@
 - Package: `npm i -g @vscode/vsce && vsce package` → creates `codex-cli-button-<version>.vsix`.
 - Install local: `code --install-extension codex-cli-button-*.vsix`.
 - Publish (optional): `vsce publish` (requires configured `publisher`).
-- Notes: Main is TypeScript; helpers remain JS. Minimal deps (`shell-quote`, `which`) for quoting and PATH checks.
+- Notes: All core modules are in TypeScript. Minimal deps (`shell-quote`, `which`) for quoting and PATH checks.
 
 ## Coding Style & Naming Conventions
 - Language: TypeScript for the entry; plain JS allowed for helpers. Two‑space indent, single quotes, semicolons.

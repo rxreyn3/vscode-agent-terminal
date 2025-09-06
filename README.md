@@ -70,7 +70,7 @@ Roadmap (high level)
 - Structured args + optional PATH precheck — done.
 
 Contributing
-- Open issues/PRs are welcome. The code is intentionally minimal; the main entry is in TypeScript (`src/extension.ts`) with helpers in plain JavaScript.
+- Open issues/PRs are welcome. The code is intentionally minimal; the extension and helpers are written in TypeScript (`src/*.ts`).
 
 Publishing
 - Package locally: `npx vsce package` (or `npm run vscode:package`). This produces `codex-cli-button-<version>.vsix`.
