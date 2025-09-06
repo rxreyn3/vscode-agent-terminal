@@ -4,10 +4,10 @@
     { "path": "B" }
   ],
   "settings": {
-    "codexcli.cwdMode": "workspaceRoot",
+    "codexcli.cwdMode": "activeFileDir",
     "codexcli.rememberSelection": true,
     "codexcli.precheckBinary": false,
-    "codexcli.terminalName": "Reuse Codex"
+    "codexcli.terminalName": "ActiveFileDir Codex"
   }
 }
 

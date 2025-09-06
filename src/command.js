@@ -122,6 +122,14 @@ function precheckBinary(options) {
     return { ok: exists, base };
   }
 
+  // Deterministic testing: when a custom spawnSync is provided, use it instead
+  // of the 'which' library to respect injected outcomes.
+  if (options && options.spawnSync) {
+    const check = isWindows ? `where ${base}` : `which ${base}`;
+    const res = spawnSync(check, { shell: true });
+    return { ok: res && res.status === 0, base };
+  }
+
   // Prefer which library when available, otherwise fallback to shelling out
   if (which && typeof which.sync === 'function') {
     try {

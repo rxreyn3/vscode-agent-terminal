@@ -1,22 +1,15 @@
-// Minimal VS Code extension in plain JS
-// Adds an editor title button that opens a terminal in the editor
-// area and runs `codex`.
+import * as vscode from 'vscode';
+import { resolveCwd } from './cwd';
+import { buildFinalCommand, precheckBinary } from './command';
+import { resolveWindowsCommand } from './windows';
 
-const vscode = require('vscode');
-const { resolveCwd } = require('./src/cwd');
-const { buildFinalCommand, precheckBinary } = require('./src/command');
-const { resolveWindowsCommand } = require('./src/windows');
+export function activate(context: vscode.ExtensionContext) {
+  let statusItem: vscode.StatusBarItem | undefined;
 
-/**
- * @param {vscode.ExtensionContext} context
- */
-function activate(context) {
-  // Status bar item lifecycle
-  let statusItem;
   function refreshStatusBar() {
     try {
       const cfg = vscode.workspace.getConfiguration('codexcli');
-      const show = cfg.get('showStatusBar', false);
+      const show = cfg.get<boolean>('showStatusBar', false);
       if (show && !statusItem) {
         statusItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, 1000);
         statusItem.text = '$(rocket) Codex';
@@ -25,13 +18,12 @@ function activate(context) {
         statusItem.show();
         context.subscriptions.push(statusItem);
       } else if (!show && statusItem) {
-        try { statusItem.dispose(); } catch (_) { /* ignore */ }
+        try { statusItem.dispose(); } catch { /* ignore */ }
         statusItem = undefined;
       } else if (show && statusItem) {
         statusItem.show();
       }
-    } catch (e) {
-      // Surface errors but don't crash activation
+    } catch (e: any) {
       vscode.window.showErrorMessage(`Codex CLI Button (status bar): ${e?.message || e}`);
     }
   }
@@ -39,18 +31,18 @@ function activate(context) {
   const run = vscode.commands.registerCommand('codexcli.run', async () => {
     try {
       const cfg = vscode.workspace.getConfiguration('codexcli');
-      let command = cfg.get('command', 'codex');
-      const args = cfg.get('args', []);
-      const precheck = cfg.get('precheckBinary', true);
-      const windowsMode = cfg.get('windowsMode', 'block');
-      const mode = cfg.get('cwdMode', 'workspaceRoot');
-      const rememberSelection = cfg.get('rememberSelection', true);
-      const cfgTerminalName = cfg.get('terminalName', 'Codex CLI');
+      let command = cfg.get<string>('command', 'codex');
+      const args = cfg.get<string[]>('args', []);
+      const precheck = cfg.get<boolean>('precheckBinary', true);
+      const windowsMode = cfg.get<string>('windowsMode', 'block');
+      const mode = cfg.get<string>('cwdMode', 'workspaceRoot');
+      const rememberSelection = cfg.get<boolean>('rememberSelection', true);
+      const cfgTerminalName = cfg.get<string>('terminalName', 'Codex CLI');
       const terminalName = String(cfgTerminalName || '').trim() || 'Codex CLI';
       const folders = vscode.workspace.workspaceFolders || [];
       const iconUri = vscode.Uri.joinPath(context.extensionUri, 'media', 'command-icon.svg');
 
-      // Soft guardrail: if users include flags in codexcli.command, suggest using args
+      // Tip: encourage structured args usage
       const tipKey = 'codexcli.tip.commandHasFlagsShown';
       const hasFlagsInCommand = /\s+-{1,2}[^\s]/.test(String(command || ''));
       if (hasFlagsInCommand && !context.workspaceState.get(tipKey)) {
@@ -61,24 +53,24 @@ function activate(context) {
         );
         await context.workspaceState.update(tipKey, true);
         if (choice === 'Open Settings') {
-          try { await vscode.commands.executeCommand('workbench.action.openSettings', 'codexcli'); } catch (_) {}
+          try { await vscode.commands.executeCommand('workbench.action.openSettings', 'codexcli'); } catch {}
         }
       }
 
       const editor = vscode.window.activeTextEditor;
       const editorUri = editor?.document?.uri;
-      const lastPickedFsPath = context.workspaceState.get('codexcli.lastPickedFsPath');
+      const lastPickedFsPath = context.workspaceState.get<string>('codexcli.lastPickedFsPath');
       let { cwd, needsPrompt } = resolveCwd({
         mode,
         folders,
         editorUri,
         rememberSelection,
         lastPickedFsPath
-      });
+      } as any);
 
       if (mode === 'prompt' && needsPrompt) {
         const picks = folders.map(f => ({
-          label: f.name || f.uri.fsPath.split(/[\\/]/).pop(),
+          label: f.name || f.uri.fsPath.split(/[\\/]/).pop()!,
           description: f.uri.fsPath,
           fsPath: f.uri.fsPath
         }));
@@ -94,16 +86,13 @@ function activate(context) {
         }
       }
 
-      // Reuse an existing terminal if we already created one.
       let term = vscode.window.terminals.find(t => t.name === terminalName);
       let created = false;
-      // If the terminal process has exited, dispose it so we can recreate fresh.
       if (term && term.exitStatus !== undefined) {
-        try { term.dispose(); } catch (_) { /* ignore */ }
+        try { term.dispose(); } catch { /* ignore */ }
         term = undefined;
       }
       if (!term) {
-        // Force terminal into the editor area by specifying a viewColumn.
         term = vscode.window.createTerminal({
           name: terminalName,
           cwd,
@@ -113,7 +102,6 @@ function activate(context) {
         created = true;
       }
 
-      // Windows gating & command adaptation
       const isWin = process.platform === 'win32';
       if (isWin) {
         const decision = resolveWindowsCommand({
@@ -121,45 +109,37 @@ function activate(context) {
           windowsMode,
           commandBase: command,
           args
-        });
-        if (decision.blocked) {
-          vscode.window.showErrorMessage(decision.reason || 'Codex CLI is not officially supported on Windows. Please use WSL or switch windowsMode.');
+        } as any);
+        if ((decision as any).blocked) {
+          vscode.window.showErrorMessage((decision as any).reason || 'Codex CLI is not officially supported on Windows. Please use WSL or switch windowsMode.');
           return;
         }
-        // Apply possible transformation (e.g., wsl.exe codex ...)
-        command = decision.commandBase;
-        // Replace args in place for downstream quoting
+        command = (decision as any).commandBase;
         while (args.length) args.pop();
-        for (const a of decision.args || []) args.push(a);
+        for (const a of ((decision as any).args || [])) args.push(a);
       }
 
-      // Build final command with quoted args and optionally precheck the base binary.
       if (precheck) {
-        const res = precheckBinary({ commandBase: command, isWindows: isWin });
+        const res = precheckBinary({ commandBase: command, isWindows: isWin } as any);
         if (!res.ok) {
-          vscode.window.showErrorMessage(
-            `Command not found: ${res.base}. Add it to PATH or set an absolute path in codexcli.command.`
-          );
+          vscode.window.showErrorMessage(`Command not found: ${res.base}. Add it to PATH or set an absolute path in codexcli.command.`);
           return;
         }
       }
 
-      const final = buildFinalCommand({ commandBase: command, args, isWindows: isWin });
+      const final = buildFinalCommand({ commandBase: command, args, isWindows: isWin } as any);
 
-      // Always move focus to the Codex terminal when shown
       term.show(false);
-      // Only send the command when creating a fresh terminal to avoid echoing
       if (created) {
         term.sendText(final, true);
       }
-    } catch (err) {
+    } catch (err: any) {
       vscode.window.showErrorMessage(`Codex CLI Button: ${err?.message || err}`);
     }
   });
 
   context.subscriptions.push(run);
 
-  // Initialize and react to setting changes for the optional status bar item
   refreshStatusBar();
   const cfgListener = vscode.workspace.onDidChangeConfiguration(e => {
     if (!e || e.affectsConfiguration('codexcli.showStatusBar') || e.affectsConfiguration('codexcli')) {
@@ -169,9 +149,5 @@ function activate(context) {
   context.subscriptions.push(cfgListener);
 }
 
-function deactivate() {}
+export function deactivate() {}
 
-module.exports = {
-  activate,
-  deactivate
-};

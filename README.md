@@ -20,7 +20,7 @@ Requirements
 
 Install / Run (development)
 1) Open this folder in VS Code.
-2) Press F5 (Run Extension) to launch an Extension Development Host.
+2) Press F5 (Run Extension) to launch an Extension Development Host. The TypeScript build runs automatically and writes to `out/`.
 3) Open any file in the Dev Host window. A rocket icon appears at the top‑right of the editor.
 4) Click the button (or use the command palette) to open the terminal and run Codex.
 
@@ -70,7 +70,7 @@ Roadmap (high level)
 - Structured args + optional PATH precheck — done.
 
 Contributing
-- Open issues/PRs are welcome. The code is intentionally minimal and written in plain JavaScript for easy hacking.
+- Open issues/PRs are welcome. The code is intentionally minimal; the main entry is in TypeScript (`src/extension.ts`) with helpers in plain JavaScript.
 
 Publishing
 - Package locally: `npx vsce package` (or `npm run vscode:package`). This produces `codex-cli-button-<version>.vsix`.

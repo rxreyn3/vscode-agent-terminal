@@ -12,23 +12,23 @@
 - Visual aids: Use ASCII diagrams in code blocks for system designs, data flows, sequences, or flow charts when they help communication.
 
 ## Project Structure & Module Organization
-- `extension.js`: Main entry point referenced by `package.json#main`.
+- `src/extension.ts`: Main entry point (compiled to `out/extension.js`, referenced by `package.json#main`).
 - `package.json`: VS Code manifest (`contributes`, commands, settings).
 - `media/`: Icons used by the command UI (e.g., `command-icon.svg`).
 - `.vscode/launch.json`: “Run Extension” config for the Extension Host.
 - `.vscodeignore`, `.gitignore`: Packaging and repo hygiene.
 
 ## Build, Test, and Development Commands
-- Run (dev): Open in VS Code → Run and Debug → “Run Extension” or press `F5`.
+- Run (dev): Open in VS Code → Run and Debug → “Run Extension” or press `F5` (preLaunch compiles TypeScript to `out/`).
 - Unit tests: `npm test` (runs resolver, command quoting/precheck, and Windows handling tests).
 - Integration tests: `npm run test:integration` (launches VS Code and exercises QuickPick cwd flow).
 - Package: `npm i -g @vscode/vsce && vsce package` → creates `codex-cli-button-<version>.vsix`.
 - Install local: `code --install-extension codex-cli-button-*.vsix`.
 - Publish (optional): `vsce publish` (requires configured `publisher`).
-- Notes: Plain JavaScript; minimal deps (`shell-quote`, `which`) for quoting and PATH checks.
+- Notes: Main is TypeScript; helpers remain JS. Minimal deps (`shell-quote`, `which`) for quoting and PATH checks.
 
 ## Coding Style & Naming Conventions
-- Language: Plain JS (ES2020+), two‑space indent, single quotes, semicolons.
+- Language: TypeScript for the entry; plain JS allowed for helpers. Two‑space indent, single quotes, semicolons.
 - Naming: camelCase for variables/functions; kebab‑case for asset files.
 - IDs/Settings: Prefix with `codexcli.*` (e.g., `codexcli.run`, `codexcli.command`).
 - Structure: Keep the extension minimal; surface errors via `vscode.window.showErrorMessage`.

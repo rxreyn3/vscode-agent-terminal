@@ -31,7 +31,7 @@
     "onCommand:codexcli.run",
     "onStartupFinished"
   ],
-  "main": "./extension.js",
+  "main": "./out/extension.js",
   "contributes": {
     "configuration": {
       "title": "Codex CLI Button",
@@ -128,11 +128,17 @@
     "test": "npm run -s test:unit && npm run -s test:integration",
     "vscode:package": "vsce package",
     "vscode:publish": "vsce publish",
-    "ovsx:publish": "ovsx publish"
+    "ovsx:publish": "ovsx publish",
+    "compile": "tsc -p .",
+    "watch": "tsc -w -p ."
   },
+  "pretest": "npm run -s compile",
   "devDependencies": {
     "@vscode/test-electron": "^2.4.1",
     "mocha": "^10.4.0",
+    "@types/node": "^16.18.0",
+    "@types/vscode": "^1.75.0",
+    "typescript": "^5.5.4",
     "ovsx": "^0.8.4",
     "vsce": "^2.15.0"
   },

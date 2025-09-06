@@ -68,7 +68,7 @@
   - Successful publish to Open VSX using `ovsx`.
   - GitHub Actions builds the `.vsix` on tag and uploads it as an artifact; if tokens are set, it publishes to the respective marketplaces.
 
-## 8) TypeScript migration (optional, recommended)
+## ~~8) TypeScript migration (optional, recommended)~~
 
 - Summary: Migrate to TypeScript for stronger typing, better IntelliSense on the VS Code API, and safer refactors. Common practice in official samples.
 - Rationale: Catch errors at compile time, improve contributor experience, align with ecosystem norms. JS is fine for small extensions; TS pays off as features grow.
