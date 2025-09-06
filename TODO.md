@@ -8,7 +8,7 @@
 
 - Summary: Choose a smarter `cwd` when multiple folders are open or when the active file lies outside a workspace. Adds a `codexcli.cwdMode` setting to control behavior.
 
-## ~~3) Command robustness (args + PATH precheck)~~
+## 3) Command robustness (args)
 
 - Summary: Support structured arguments and proactively check whether the base binary exists on PATH before running. Provides reliable quoting and early, friendly errors.
 

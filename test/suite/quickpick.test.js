@@ -7,13 +7,16 @@ const vscode = require('vscode');
 describe('QuickPick cwd prompt', function() {
   it('prompt mode uses selected folder as cwd and remembers it', async function() {
     // Ensure our extension is activated on demand when the command runs
-    const ext = vscode.extensions.getExtension('local.codex-cli-button');
+    const ext = vscode.extensions.getExtension('local.repl-runner');
     assert.ok(ext, 'Extension should be found');
 
     // Configure the extension for prompt mode and to remember selections
-    const cfg = vscode.workspace.getConfiguration('codexcli');
+    const cfg = vscode.workspace.getConfiguration('replrunner');
     await cfg.update('cwdMode', 'prompt', vscode.ConfigurationTarget.Workspace);
     await cfg.update('rememberSelection', true, vscode.ConfigurationTarget.Workspace);
+    await cfg.update('profiles', [
+      { id: 'test', label: 'Test REPL', command: 'codex', args: [] }
+    ], vscode.ConfigurationTarget.Workspace);
 
     // Build expected pick for folder B in the opened multi-root workspace
     const workspaceFile = path.resolve(__dirname, '../../test-fixtures/multi-root.code-workspace');
@@ -46,7 +49,7 @@ describe('QuickPick cwd prompt', function() {
 
     try {
       // Execute the command which should trigger the QuickPick and use folder B as cwd
-      await vscode.commands.executeCommand('codexcli.run');
+      await vscode.commands.executeCommand('replrunner.run');
 
       assert.strictEqual(quickPickCalls > 0, true, 'QuickPick should be shown');
       assert.strictEqual(path.resolve(capturedCwd), path.resolve(folderB), 'cwd should be folder B');
@@ -58,13 +61,14 @@ describe('QuickPick cwd prompt', function() {
   });
 
   it('uses configured terminalName when creating a terminal', async function() {
-    const ext = vscode.extensions.getExtension('local.codex-cli-button');
+    const ext = vscode.extensions.getExtension('local.repl-runner');
     assert.ok(ext, 'Extension should be found');
 
-    const cfg = vscode.workspace.getConfiguration('codexcli');
+    const cfg = vscode.workspace.getConfiguration('replrunner');
     await cfg.update('cwdMode', 'workspaceRoot', vscode.ConfigurationTarget.Workspace);
-    await cfg.update('precheckBinary', false, vscode.ConfigurationTarget.Workspace);
-    await cfg.update('terminalName', 'My Codex', vscode.ConfigurationTarget.Workspace);
+    await cfg.update('profiles', [
+      { id: 'test', label: 'Test REPL', command: 'codex', terminalName: 'My REPL' }
+    ], vscode.ConfigurationTarget.Workspace);
 
     let capturedName = undefined;
     const originalCreateTerminal = vscode.window.createTerminal;
@@ -80,26 +84,27 @@ describe('QuickPick cwd prompt', function() {
     };
 
     try {
-      await vscode.commands.executeCommand('codexcli.run');
-      assert.strictEqual(capturedName, 'My Codex');
+      await vscode.commands.executeCommand('replrunner.run');
+      assert.strictEqual(capturedName, 'My REPL');
     } finally {
       vscode.window.createTerminal = originalCreateTerminal;
     }
   });
 
   it('reuses existing terminal matching terminalName (no duplicate create)', async function() {
-    const ext = vscode.extensions.getExtension('local.codex-cli-button');
+    const ext = vscode.extensions.getExtension('local.repl-runner');
     assert.ok(ext, 'Extension should be found');
 
-    const cfg = vscode.workspace.getConfiguration('codexcli');
+    const cfg = vscode.workspace.getConfiguration('replrunner');
     await cfg.update('cwdMode', 'workspaceRoot', vscode.ConfigurationTarget.Workspace);
-    await cfg.update('precheckBinary', false, vscode.ConfigurationTarget.Workspace);
-    await cfg.update('terminalName', 'Reuse Codex', vscode.ConfigurationTarget.Workspace);
+    await cfg.update('profiles', [
+      { id: 'test', label: 'Test REPL', command: 'codex', terminalName: 'Reuse REPL' }
+    ], vscode.ConfigurationTarget.Workspace);
 
     // Fake existing terminal with matching name
     let showCalls = 0;
     const fakeTerm = {
-      name: 'Reuse Codex',
+      name: 'Reuse REPL',
       exitStatus: undefined,
       show: () => { showCalls++; },
       sendText: () => {},
@@ -122,7 +127,7 @@ describe('QuickPick cwd prompt', function() {
     };
 
     try {
-      await vscode.commands.executeCommand('codexcli.run');
+      await vscode.commands.executeCommand('replrunner.run');
       assert.strictEqual(createCalls, 0, 'Should not create a new terminal when one matches by name');
       assert.ok(showCalls > 0, 'Existing terminal should be shown');
     } finally {
@@ -134,13 +139,15 @@ describe('QuickPick cwd prompt', function() {
     }
   });
 
-  it('sets terminal icon to media/command-icon.svg', async function() {
-    const ext = vscode.extensions.getExtension('local.codex-cli-button');
+  it('does not set iconPath by default (uses terminal default)', async function() {
+    const ext = vscode.extensions.getExtension('local.repl-runner');
     assert.ok(ext, 'Extension should be found');
 
-    const cfg = vscode.workspace.getConfiguration('codexcli');
+    const cfg = vscode.workspace.getConfiguration('replrunner');
     await cfg.update('cwdMode', 'workspaceRoot', vscode.ConfigurationTarget.Workspace);
-    await cfg.update('precheckBinary', false, vscode.ConfigurationTarget.Workspace);
+    await cfg.update('profiles', [
+      { id: 'test', label: 'Test REPL', command: 'codex' }
+    ], vscode.ConfigurationTarget.Workspace);
 
     let capturedIcon = undefined;
     const originalCreateTerminal = vscode.window.createTerminal;
@@ -156,10 +163,10 @@ describe('QuickPick cwd prompt', function() {
     };
 
     try {
-      await vscode.commands.executeCommand('codexcli.run');
-      assert.ok(capturedIcon, 'iconPath should be set');
-      const asString = String(capturedIcon);
-      assert.ok(asString.includes('media/command-icon.svg'), 'iconPath should point to media/command-icon.svg');
+      await vscode.commands.executeCommand('replrunner.run');
+      // By default, no explicit iconPath is set so VS Code uses the
+      // built-in terminal icon automatically.
+      assert.strictEqual(capturedIcon, undefined, 'iconPath should be undefined to use default terminal icon');
     } finally {
       vscode.window.createTerminal = originalCreateTerminal;
     }

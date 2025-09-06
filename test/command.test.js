@@ -34,34 +34,7 @@ run('buildFinalCommand quotes args (Windows)', () => {
   assert.strictEqual(final, 'codex "-p" "my \\\"quoted\\\" profile"');
 });
 
-run('precheckBinary fails when which/where returns non-zero', () => {
-  assert.ok(cmd, 'src/command.js should be implemented');
-  const fakeSpawn = () => ({ status: 1 });
-  const res = cmd.precheckBinary({ commandBase: 'codex --flag', isWindows: false, spawnSync: fakeSpawn });
-  assert.strictEqual(res.ok, false);
-  assert.strictEqual(res.base, 'codex');
-});
-
-run('precheckBinary passes when which/where returns zero', () => {
-  assert.ok(cmd, 'src/command.js should be implemented');
-  const fakeSpawn = () => ({ status: 0 });
-  const res = cmd.precheckBinary({ commandBase: 'codex', isWindows: false, spawnSync: fakeSpawn });
-  assert.strictEqual(res.ok, true);
-});
-
-run('precheckBinary uses fs check for path-based command (exists)', () => {
-  assert.ok(cmd, 'src/command.js should be implemented');
-  const fakeFs = { existsSync: (p) => p.endsWith('codex') };
-  const res = cmd.precheckBinary({ commandBase: '/usr/local/bin/codex', isWindows: false, fs: fakeFs });
-  assert.strictEqual(res.ok, true);
-});
-
-run('precheckBinary uses fs check for path-based command (missing)', () => {
-  assert.ok(cmd, 'src/command.js should be implemented');
-  const fakeFs = { existsSync: () => false };
-  const res = cmd.precheckBinary({ commandBase: '/opt/tools/codex', isWindows: false, fs: fakeFs });
-  assert.strictEqual(res.ok, false);
-});
+// precheckBinary removed: extension relies on terminal environment
 
 run('buildFinalCommand tokenizes composite arg (POSIX)', () => {
   assert.ok(cmd, 'src/command.js should be implemented');

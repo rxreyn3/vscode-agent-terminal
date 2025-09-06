@@ -5,22 +5,23 @@ const path = require('path');
 const vscode = require('vscode');
 
 describe('Basic extension checks', function() {
-  it('registers the codexcli.run command', async function() {
-    const ext = vscode.extensions.getExtension('local.codex-cli-button');
+  it('registers the replrunner.run command', async function() {
+    const ext = vscode.extensions.getExtension('local.repl-runner');
     assert.ok(ext, 'Extension should be found');
     const cmds = await vscode.commands.getCommands(true);
-    assert.ok(cmds.includes('codexcli.run'), 'codexcli.run should be registered');
+    assert.ok(cmds.includes('replrunner.run'), 'replrunner.run should be registered');
   });
 
   it('recreates terminal after exit and sends command once', async function() {
-    const cfg = vscode.workspace.getConfiguration('codexcli');
-    await cfg.update('precheckBinary', false, vscode.ConfigurationTarget.Workspace);
+    const cfg = vscode.workspace.getConfiguration('replrunner');
     await cfg.update('cwdMode', 'workspaceRoot', vscode.ConfigurationTarget.Workspace);
-    await cfg.update('terminalName', 'Recreate Codex', vscode.ConfigurationTarget.Workspace);
+    await cfg.update('profiles', [
+      { id: 'test', label: 'Test REPL', command: 'codex', terminalName: 'Recreate REPL' }
+    ], vscode.ConfigurationTarget.Workspace);
 
     // Existing terminal with matching name but exited
     const fakeDead = {
-      name: 'Recreate Codex',
+      name: 'Recreate REPL',
       exitStatus: { code: 0 },
       dispose: () => {}
     };
@@ -47,7 +48,7 @@ describe('Basic extension checks', function() {
     };
 
     try {
-      await vscode.commands.executeCommand('codexcli.run');
+      await vscode.commands.executeCommand('replrunner.run');
       assert.ok(createdOptions, 'Should create a new terminal after exit');
       assert.strictEqual(sendCalls, 1, 'Should send command once for new terminal');
     } finally {
@@ -59,10 +60,11 @@ describe('Basic extension checks', function() {
   });
 
   it('workspaceRoot mode uses first folder as cwd', async function() {
-    const cfg = vscode.workspace.getConfiguration('codexcli');
-    await cfg.update('precheckBinary', false, vscode.ConfigurationTarget.Workspace);
+    const cfg = vscode.workspace.getConfiguration('replrunner');
     await cfg.update('cwdMode', 'workspaceRoot', vscode.ConfigurationTarget.Workspace);
-    await cfg.update('terminalName', 'Root Codex', vscode.ConfigurationTarget.Workspace);
+    await cfg.update('profiles', [
+      { id: 'test', label: 'Test REPL', command: 'codex', terminalName: 'Root REPL' }
+    ], vscode.ConfigurationTarget.Workspace);
 
     const workspaceFile = path.resolve(__dirname, '../../test-fixtures/multi-root.code-workspace');
     const fixturesRoot = path.dirname(workspaceFile);
@@ -82,7 +84,7 @@ describe('Basic extension checks', function() {
     };
 
     try {
-      await vscode.commands.executeCommand('codexcli.run');
+      await vscode.commands.executeCommand('replrunner.run');
       assert.strictEqual(path.resolve(capturedCwd), path.resolve(folderA));
     } finally {
       vscode.window.createTerminal = originalCreateTerminal;
@@ -90,10 +92,11 @@ describe('Basic extension checks', function() {
   });
 
   it('activeWorkspace mode uses workspace containing active file', async function() {
-    const cfg = vscode.workspace.getConfiguration('codexcli');
-    await cfg.update('precheckBinary', false, vscode.ConfigurationTarget.Workspace);
+    const cfg = vscode.workspace.getConfiguration('replrunner');
     await cfg.update('cwdMode', 'activeWorkspace', vscode.ConfigurationTarget.Workspace);
-    await cfg.update('terminalName', 'ActiveWS Codex', vscode.ConfigurationTarget.Workspace);
+    await cfg.update('profiles', [
+      { id: 'test', label: 'Test REPL', command: 'codex', terminalName: 'ActiveWS REPL' }
+    ], vscode.ConfigurationTarget.Workspace);
 
     const workspaceFile = path.resolve(__dirname, '../../test-fixtures/multi-root.code-workspace');
     const fixturesRoot = path.dirname(workspaceFile);
@@ -117,7 +120,7 @@ describe('Basic extension checks', function() {
     };
 
     try {
-      await vscode.commands.executeCommand('codexcli.run');
+      await vscode.commands.executeCommand('replrunner.run');
       assert.strictEqual(path.resolve(capturedCwd), path.resolve(folderB));
     } finally {
       vscode.window.createTerminal = originalCreateTerminal;
@@ -125,10 +128,11 @@ describe('Basic extension checks', function() {
   });
 
   it('activeFileDir mode uses directory of active file', async function() {
-    const cfg = vscode.workspace.getConfiguration('codexcli');
-    await cfg.update('precheckBinary', false, vscode.ConfigurationTarget.Workspace);
+    const cfg = vscode.workspace.getConfiguration('replrunner');
     await cfg.update('cwdMode', 'activeFileDir', vscode.ConfigurationTarget.Workspace);
-    await cfg.update('terminalName', 'ActiveFileDir Codex', vscode.ConfigurationTarget.Workspace);
+    await cfg.update('profiles', [
+      { id: 'test', label: 'Test REPL', command: 'codex', terminalName: 'ActiveFileDir REPL' }
+    ], vscode.ConfigurationTarget.Workspace);
 
     const workspaceFile = path.resolve(__dirname, '../../test-fixtures/multi-root.code-workspace');
     const fixturesRoot = path.dirname(workspaceFile);
@@ -152,11 +156,10 @@ describe('Basic extension checks', function() {
     };
 
     try {
-      await vscode.commands.executeCommand('codexcli.run');
+      await vscode.commands.executeCommand('replrunner.run');
       assert.strictEqual(path.resolve(capturedCwd), path.dirname(path.resolve(nestedFile)));
     } finally {
       vscode.window.createTerminal = originalCreateTerminal;
     }
   });
 });
-

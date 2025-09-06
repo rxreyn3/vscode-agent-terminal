@@ -13,11 +13,11 @@
 
 ## Project Structure & Module Organization
 - `src/extension.ts`: Main entry point (compiled to `out/extension.js`, referenced by `package.json#main`).
-- `src/command.ts` → `out/command.js`: Arg quoting + PATH precheck helpers.
+- `src/command.ts` → `out/command.js`: Arg quoting helpers.
 - `src/windows.ts` → `out/windows.js`: Windows handling (`block`/`wsl`/`native`).
 - `src/cwd.ts` → `out/cwd.js`: Workspace cwd resolution helpers.
 - `package.json`: VS Code manifest (`contributes`, commands, settings).
-- `media/`: Icons used by the command UI (e.g., `command-icon.svg`).
+- `media/`: Optional profile icons (e.g., `profile-*.svg`). The editor and terminal use the built-in terminal icon by default.
 - `.vscode/launch.json`: “Run Extension” config for the Extension Host.
 - `.vscodeignore`, `.gitignore`: Packaging and repo hygiene.
 
@@ -35,7 +35,7 @@
            |                      |
            +----------+-----------+
                       |
-   precheckBinary + buildFinalCommand (src/command.ts)
+   buildFinalCommand (src/command.ts)
                       |
             VS Code Terminal (create/reuse)
                └─ sendText on first creation only
@@ -43,7 +43,7 @@
 
 ## Build, Test, and Development Commands
 - Run (dev): Open in VS Code → Run and Debug → “Run Extension” or press `F5` (preLaunch compiles TypeScript to `out/`).
-- Unit tests: `npm test` (runs resolver, command quoting/precheck, and Windows handling tests).
+- Unit tests: `npm test` (runs resolver, command quoting, and Windows handling tests).
 - Integration tests: `npm run test:integration` (launches VS Code and exercises QuickPick cwd flow).
 - Package: `npm i -g @vscode/vsce && vsce package` → creates `codex-cli-button-<version>.vsix`.
 - Install local: `code --install-extension codex-cli-button-*.vsix`.
@@ -55,7 +55,7 @@ Notes (tests): Unit/integration tests import from `out/*.js`. The `pretest` scri
 ## Coding Style & Naming Conventions
 - Language: TypeScript for the entry; plain JS allowed for helpers. Two‑space indent, single quotes, semicolons.
 - Naming: camelCase for variables/functions; kebab‑case for asset files.
-- IDs/Settings: Prefix with `codexcli.*` (e.g., `codexcli.run`, `codexcli.command`).
+- IDs/Settings: Prefix with `replrunner.*` (e.g., `replrunner.run`, `replrunner.profiles`).
 - Structure: Keep the extension minimal; surface errors via `vscode.window.showErrorMessage`.
 
 ## Testing Guidelines
@@ -79,17 +79,22 @@ Notes (tests): Unit/integration tests import from `out/*.js`. The `pretest` scri
 - PRs: Include what/why, testing steps, and any screenshots/GIFs of the editor title button and terminal behavior. Link related issues and update README/settings docs when adding commands or configuration.
 
 ## Security & Configuration Tips
-- The command is configurable (`codexcli.command`). Provide absolute paths when helpful (e.g., `/usr/local/bin/codex`).
-- Structured args: prefer `codexcli.args` over embedding quoting in `command`; args are quoted per‑platform.
-- PATH precheck: `codexcli.precheckBinary` (default `true`) surfaces a friendly “Command not found” if the base binary isn’t found. Disable if your shell PATH differs from the extension host.
-- Windows support: `codexcli.windowsMode` — `block` (default), `wsl` (runs `wsl.exe codex ...`), `native` (experimental).
-- Multi‑root workspaces: control cwd selection with `codexcli.cwdMode` (`workspaceRoot` | `activeWorkspace` | `activeFileDir` | `prompt`). In `prompt` mode, `codexcli.rememberSelection` can persist the last choice per workspace.
+- REPLs are configured via profiles (`replrunner.profiles`). Provide absolute paths when helpful (e.g., `/usr/local/bin/codex`).
+- Structured args: put flags/values in the profile `args`; args are quoted per‑platform.
+ 
+- Windows support: `replrunner.windowsMode` — `block` (default), `wsl` (wraps with `wsl.exe`), `native` (experimental).
+- Multi‑root workspaces: control cwd selection with `replrunner.cwdMode` (`workspaceRoot` | `activeWorkspace` | `activeFileDir` | `prompt`). In `prompt` mode, `replrunner.rememberSelection` can persist the last choice per workspace.
 
 ## Project Structure & Modules (additions)
-- `src/command.ts` → `out/command.js`: Arg quoting and PATH precheck helpers (`buildFinalCommand`, `precheckBinary`).
+- `src/command.ts` → `out/command.js`: Arg quoting helper (`buildFinalCommand`).
 - `src/windows.ts` → `out/windows.js`: Windows handling (`block`/`wsl`/`native`) for `codex` invocation.
 - `src/cwd.ts` → `out/cwd.js`: CWD resolution modes (`workspaceRoot`, `activeWorkspace`, `activeFileDir`, `prompt`).
 - Tests: `test/command.test.js`, `test/windows.test.js`, and integration tests under `test/suite/`.
 
 ## Potential Enhancements (for discussion)
 - Profiles: named command+args presets selectable via QuickPick (optionally remember last profile per workspace).
+
+## Functional Constraints
+- Do not resend the command when the terminal is already alive. `sendText` is invoked only when creating a new terminal instance. Subsequent invocations focus/reuse the terminal without re-sending.
+- Terminal focus: launching focuses the terminal.
+- Windows: functionality is sufficient for now (`block` default, with `wsl` and `native` available). No further Windows work is prioritized.
