@@ -45,8 +45,8 @@
 - Run (dev): Open in VS Code → Run and Debug → “Run Extension” or press `F5` (preLaunch compiles TypeScript to `out/`).
 - Unit tests: `npm test` (runs resolver, command quoting, and Windows handling tests).
 - Integration tests: `npm run test:integration` (launches VS Code and exercises QuickPick cwd flow).
-- Package: `npm i -g @vscode/vsce && vsce package` → creates `codex-cli-button-<version>.vsix`.
-- Install local: `code --install-extension codex-cli-button-*.vsix`.
+- Package: `npm i -g @vscode/vsce && vsce package` → creates `repl-runner-<version>.vsix`.
+- Install local: `code --install-extension repl-runner-*.vsix`.
 - Publish (optional): `vsce publish` (requires configured `publisher`).
 - Notes: All core modules are in TypeScript. Minimal deps (`shell-quote`, `which`) for quoting and PATH checks.
 
