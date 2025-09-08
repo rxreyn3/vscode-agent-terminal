@@ -26,8 +26,11 @@ jobs:
       - name: Compile (TypeScript)
         run: npm run -s compile
 
-      - name: Run tests
-        run: npm test
+      - name: Run unit tests
+        run: npm run -s test:unit
+
+      - name: Run integration tests (xvfb)
+        run: xvfb-run -a npm run -s test:integration
 
       - name: Package VSIX
         run: npx vsce package
