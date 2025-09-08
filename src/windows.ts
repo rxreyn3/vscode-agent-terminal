@@ -20,7 +20,7 @@ export function resolveWindowsCommand(opts: {
   if (mode === 'block') {
     return {
       blocked: true,
-      reason: 'Codex CLI on Windows is experimental. Please use WSL or switch windowsMode.',
+      reason: 'Running REPL commands on Windows is experimental. Please use WSL or switch windowsMode.',
       commandBase: base,
       args
     };
@@ -40,4 +40,3 @@ export function resolveWindowsCommand(opts: {
 }
 
 export default { resolveWindowsCommand };
-

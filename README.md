@@ -11,18 +11,18 @@ What it does
 
 Requirements
 - VS Code 1.75+ (engines.vscode ^1.75.0).
-- Codex CLI installed and available on your PATH (or set an absolute path via settings).
+- At least one REPL CLI installed and available on your PATH (or set an absolute path in a profile), e.g., `codex`, `claude`, `gemini`, `qwen`.
 - Platform support:
   - macOS and Linux: officially supported.
-  - Windows: experimental. Prefer running Codex inside WSL.
-    - Set `codexcli.command` to `wsl.exe codex` or set `codexcli.windowsMode` to `"wsl"` to auto-wrap.
-    - Default behavior is `codexcli.windowsMode: "block"` which shows an error and suggests WSL.
+  - Windows: experimental. Prefer running your CLI inside WSL.
+    - To auto-wrap commands with WSL, set `replrunner.windowsMode` to `"wsl"`.
+    - Default behavior is `replrunner.windowsMode: "block"` which shows an error and suggests WSL.
 
 Install / Run (development)
 1) Open this folder in VS Code.
 2) Press F5 (Run Extension) to launch an Extension Development Host. The TypeScript build runs automatically and writes to `out/`.
 3) Open any file in the Dev Host window. A terminal icon appears at the top‑right of the editor.
-4) Click the button (or use the command palette) to open the terminal and run Codex.
+4) Click the button (or use the command palette) to open the terminal and run the selected profile’s command.
 
 Usage
 - Editor title button: click the terminal icon in the top‑right when an editor has focus.

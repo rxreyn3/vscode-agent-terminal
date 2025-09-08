@@ -81,7 +81,7 @@ export function activate(context: vscode.ExtensionContext) {
       const hasFlagsInCommand = /\s+-{1,2}[^\s]/.test(String(command || ''));
       if (hasFlagsInCommand && !context.workspaceState.get(tipKey)) {
         const choice = await vscode.window.showInformationMessage(
-          "Tip: Move flags from 'command' into profile 'args' for reliable quoting (e.g., command: 'codex', args: ['-p', 'brain']).",
+          "Tip: Move flags from 'command' into profile 'args' for reliable quoting (e.g., command: 'mycli', args: ['-p', 'profile']).",
           'Open Settings',
           'Dismiss'
         );

@@ -1,16 +1,5 @@
 # Repository Guidelines
 
-## Agent Operating Rules
-- Clarify before coding: If a prompt has open questions or ambiguity, ask Ryan specific questions and wait for answers before implementing.
-- Confirm intent to implement: When a request doesn’t clearly ask to start building, confirm whether to proceed before making changes.
-- TDD by default: Practice test‑driven development. Start with a failing test (or update tests to fail), implement the minimal change to pass, then refactor.
-- Update docs after changes: After any meaningful change, review and update relevant docs (README and this AGENTS.md) to reflect new behavior or settings.
-- Be proactive and critical: Assume Ryan may not have all constraints in mind. Suggest simpler or safer approaches, call out risks, and recommend small, reviewable steps.
-- Guiding principles: KISS, FOK (Focus on the key), YAGNI, DRY, SRP.
-- Addressing: Address the user as “Ryan” in messages.
-- Message style: Use Markdown icons/emoji to aid scannability when appropriate (e.g., ✅, ⚠️, 💡).
-- Visual aids: Use ASCII diagrams in code blocks for system designs, data flows, sequences, or flow charts when they help communication.
-
 ## Project Structure & Module Organization
 - `src/extension.ts`: Main entry point (compiled to `out/extension.js`, referenced by `package.json#main`).
 - `src/command.ts` → `out/command.js`: Arg quoting helpers.
@@ -61,8 +50,8 @@ Notes (tests): Unit/integration tests import from `out/*.js`. The `pretest` scri
 ## Testing Guidelines
 - Manual checks:
   - Editor button appears when an editor has focus.
-  - Status bar action appears when `codexcli.showStatusBar` is true; clicking it triggers the same behavior as the editor button.
-  - Terminal named “Codex CLI” opens in the editor area and runs the configured command.
+  - Status bar action appears when `replrunner.showStatusBar` is true; clicking it triggers the same behavior as the editor button.
+  - Terminal opens in the editor area using the selected profile’s name and runs its configured command.
   - Terminal is reused when alive and recreated after exit.
   - Launch behavior: terminal gains focus when launching.
 - Automated:
@@ -87,7 +76,7 @@ Notes (tests): Unit/integration tests import from `out/*.js`. The `pretest` scri
 
 ## Project Structure & Modules (additions)
 - `src/command.ts` → `out/command.js`: Arg quoting helper (`buildFinalCommand`).
-- `src/windows.ts` → `out/windows.js`: Windows handling (`block`/`wsl`/`native`) for `codex` invocation.
+- `src/windows.ts` → `out/windows.js`: Windows handling (`block`/`wsl`/`native`) for generic REPL commands.
 - `src/cwd.ts` → `out/cwd.js`: CWD resolution modes (`workspaceRoot`, `activeWorkspace`, `activeFileDir`, `prompt`).
 - Tests: `test/command.test.js`, `test/windows.test.js`, and integration tests under `test/suite/`.
 
