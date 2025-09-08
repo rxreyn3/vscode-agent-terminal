@@ -7,9 +7,9 @@
     "codexcli.cwdMode": "activeFileDir",
     "codexcli.rememberSelection": true,
     "codexcli.terminalName": "ActiveFileDir Codex",
-    "replrunner.cwdMode": "activeFileDir",
-    "replrunner.rememberSelection": true,
-    "replrunner.profiles": [
+    "agentterminal.cwdMode": "activeFileDir",
+    "agentterminal.rememberSelection": true,
+    "agentterminal.profiles": [
       {
         "id": "test",
         "label": "Test REPL",

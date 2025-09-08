@@ -1,18 +1,18 @@
 {
-  "name": "repl-runner",
-  "displayName": "REPL Runner",
-  "description": "Run a configurable coding REPL in a terminal in the editor area. Profiles let you choose between multiple CLIs.",
+  "name": "agent-terminal",
+  "displayName": "Agent Terminal",
+  "description": "Run a configurable agent/REPL in a terminal in the editor area. Profiles let you choose between multiple CLIs.",
   "version": "0.0.1",
   "publisher": "ryanreynolds",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/rxreyn3/repl-runner-vscode.git"
+    "url": "https://github.com/rxreyn3/vscode-agent-terminal.git"
   },
   "bugs": {
-    "url": "https://github.com/rxreyn3/repl-runner-vscode/issues"
+    "url": "https://github.com/rxreyn3/vscode-agent-terminal/issues"
   },
-  "homepage": "https://github.com/rxreyn3/repl-runner-vscode#readme",
+  "homepage": "https://github.com/rxreyn3/vscode-agent-terminal#readme",
   "engines": {
     "vscode": "^1.75.0"
   },
@@ -20,6 +20,8 @@
     "Other"
   ],
   "keywords": [
+    "agent",
+    "agents",
     "codex",
     "cli",
     "terminal",
@@ -45,15 +47,15 @@
     "qwen-code"
   ],
   "activationEvents": [
-    "onCommand:replrunner.run",
+    "onCommand:agentterminal.run",
     "onStartupFinished"
   ],
   "main": "./out/extension.js",
   "contributes": {
     "configuration": {
-      "title": "REPL Runner",
+      "title": "Agent Terminal",
       "properties": {
-        "replrunner.profiles": {
+        "agentterminal.profiles": {
           "type": "array",
           "default": [
             { "id": "codex", "label": "Codex", "command": "codex", "args": [], "icon": "media/profile-codex.svg" },
@@ -77,9 +79,9 @@
             },
             "required": ["id", "label", "command"]
           },
-          "markdownDescription": "List of REPL profiles to choose from. Each profile defines a label, command, and optional args. When more than one profile exists, a QuickPick lets you choose which to run."
+          "markdownDescription": "List of Agent profiles to choose from. Each profile defines a label, command, and optional args. When more than one profile exists, a QuickPick lets you choose which to run."
         },
-        "replrunner.cwdMode": {
+        "agentterminal.cwdMode": {
           "type": "string",
           "default": "workspaceRoot",
           "enum": [
@@ -90,12 +92,12 @@
           ],
           "markdownDescription": "Working directory mode. `workspaceRoot`: first workspace folder. `activeWorkspace`: workspace containing active file. `activeFileDir`: directory of active file. `prompt`: pick a folder when multiple are open."
         },
-        "replrunner.rememberSelection": {
+        "agentterminal.rememberSelection": {
           "type": "boolean",
           "default": true,
           "description": "When in 'prompt' mode, remember the last selected folder and reuse it."
         },
-        "replrunner.windowsMode": {
+        "agentterminal.windowsMode": {
           "type": "string",
           "default": "block",
           "enum": [
@@ -105,25 +107,25 @@
           ],
           "markdownDescription": "Windows handling. `block`: show an error (recommended). `wsl`: invoke via `wsl.exe`. `native`: run as-is (experimental)."
         },
-        "replrunner.showStatusBar": {
+        "agentterminal.showStatusBar": {
           "type": "boolean",
           "default": false,
-          "markdownDescription": "Show a status bar action to run a REPL from anywhere. When enabled, a right-side REPL button appears and triggers 'replrunner.run'."
+          "markdownDescription": "Show a status bar action to run an Agent from anywhere. When enabled, a right-side button appears and triggers 'agentterminal.run'."
         }
       }
     },
     "commands": [
       {
-        "command": "replrunner.run",
-        "title": "Run REPL",
-        "category": "REPL",
+        "command": "agentterminal.run",
+        "title": "Run Agent",
+        "category": "Agent",
         "icon": "$(terminal)"
       }
     ],
     "menus": {
       "editor/title": [
         {
-          "command": "replrunner.run",
+          "command": "agentterminal.run",
           "group": "navigation@100",
           "when": "editorTextFocus"
         }
@@ -131,7 +133,7 @@
     },
     "keybindings": [
       {
-        "command": "replrunner.run",
+        "command": "agentterminal.run",
         "key": "cmd+shift+.",
         "when": "editorTextFocus && !terminalFocus"
       }

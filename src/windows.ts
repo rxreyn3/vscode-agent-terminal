@@ -20,7 +20,7 @@ export function resolveWindowsCommand(opts: {
   if (mode === 'block') {
     return {
       blocked: true,
-      reason: 'Running REPL commands on Windows is experimental. Please use WSL or switch windowsMode.',
+      reason: 'Running Agent Terminal commands on Windows is experimental. Please use WSL or switch windowsMode.',
       commandBase: base,
       args
     };

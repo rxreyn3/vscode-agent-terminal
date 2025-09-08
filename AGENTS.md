@@ -34,8 +34,8 @@
 - Run (dev): Open in VS Code → Run and Debug → “Run Extension” or press `F5` (preLaunch compiles TypeScript to `out/`).
 - Unit tests: `npm test` (runs resolver, command quoting, and Windows handling tests).
 - Integration tests: `npm run test:integration` (launches VS Code and exercises QuickPick cwd flow).
-- Package: `npm i -g @vscode/vsce && vsce package` → creates `repl-runner-<version>.vsix`.
-- Install local: `code --install-extension repl-runner-*.vsix`.
+- Package: `npm i -g @vscode/vsce && vsce package` → creates `agent-terminal-<version>.vsix`.
+- Install local: `code --install-extension agent-terminal-*.vsix`.
 - Publish (optional): `vsce publish` (requires configured `publisher`).
 - Notes: All core modules are in TypeScript. Minimal deps (`shell-quote`, `which`) for quoting and PATH checks.
 
@@ -44,13 +44,13 @@ Notes (tests): Unit/integration tests import from `out/*.js`. The `pretest` scri
 ## Coding Style & Naming Conventions
 - Language: TypeScript for the entry; plain JS allowed for helpers. Two‑space indent, single quotes, semicolons.
 - Naming: camelCase for variables/functions; kebab‑case for asset files.
-- IDs/Settings: Prefix with `replrunner.*` (e.g., `replrunner.run`, `replrunner.profiles`).
+- IDs/Settings: Prefix with `agentterminal.*` (e.g., `agentterminal.run`, `agentterminal.profiles`).
 - Structure: Keep the extension minimal; surface errors via `vscode.window.showErrorMessage`.
 
 ## Testing Guidelines
 - Manual checks:
   - Editor button appears when an editor has focus.
-  - Status bar action appears when `replrunner.showStatusBar` is true; clicking it triggers the same behavior as the editor button.
+  - Status bar action appears when `agentterminal.showStatusBar` is true; clicking it triggers the same behavior as the editor button.
   - Terminal opens in the editor area using the selected profile’s name and runs its configured command.
   - Terminal is reused when alive and recreated after exit.
   - Launch behavior: terminal gains focus when launching.
@@ -68,11 +68,11 @@ Notes (tests): Unit/integration tests import from `out/*.js`. The `pretest` scri
 - PRs: Include what/why, testing steps, and any screenshots/GIFs of the editor title button and terminal behavior. Link related issues and update README/settings docs when adding commands or configuration.
 
 ## Security & Configuration Tips
-- REPLs are configured via profiles (`replrunner.profiles`). Provide absolute paths when helpful (e.g., `/usr/local/bin/codex`).
+- REPLs/agents are configured via profiles (`agentterminal.profiles`). Provide absolute paths when helpful (e.g., `/usr/local/bin/codex`).
 - Structured args: put flags/values in the profile `args`; args are quoted per‑platform.
  
-- Windows support: `replrunner.windowsMode` — `block` (default), `wsl` (wraps with `wsl.exe`), `native` (experimental).
-- Multi‑root workspaces: control cwd selection with `replrunner.cwdMode` (`workspaceRoot` | `activeWorkspace` | `activeFileDir` | `prompt`). In `prompt` mode, `replrunner.rememberSelection` can persist the last choice per workspace.
+- Windows support: `agentterminal.windowsMode` — `block` (default), `wsl` (wraps with `wsl.exe`), `native` (experimental).
+- Multi‑root workspaces: control cwd selection with `agentterminal.cwdMode` (`workspaceRoot` | `activeWorkspace` | `activeFileDir` | `prompt`). In `prompt` mode, `agentterminal.rememberSelection` can persist the last choice per workspace.
 
 ## Project Structure & Modules (additions)
 - `src/command.ts` → `out/command.js`: Arg quoting helper (`buildFinalCommand`).

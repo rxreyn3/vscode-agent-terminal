@@ -5,15 +5,17 @@ const path = require('path');
 const vscode = require('vscode');
 
 describe('Basic extension checks', function() {
-  it('registers the replrunner.run command', async function() {
-    const ext = vscode.extensions.getExtension('local.repl-runner');
+  it('registers the agentterminal.run command', async function() {
+    const pkg = require('../../package.json');
+    const extId = (pkg && pkg.publisher) ? `${pkg.publisher}.${pkg.name}` : `local.${pkg.name}`;
+    const ext = vscode.extensions.getExtension(extId);
     assert.ok(ext, 'Extension should be found');
     const cmds = await vscode.commands.getCommands(true);
-    assert.ok(cmds.includes('replrunner.run'), 'replrunner.run should be registered');
+    assert.ok(cmds.includes('agentterminal.run'), 'agentterminal.run should be registered');
   });
 
   it('recreates terminal after exit and sends command once', async function() {
-    const cfg = vscode.workspace.getConfiguration('replrunner');
+    const cfg = vscode.workspace.getConfiguration('agentterminal');
     await cfg.update('cwdMode', 'workspaceRoot', vscode.ConfigurationTarget.Workspace);
     await cfg.update('profiles', [
       { id: 'test', label: 'Test REPL', command: 'codex', terminalName: 'Recreate REPL' }
@@ -48,7 +50,7 @@ describe('Basic extension checks', function() {
     };
 
     try {
-      await vscode.commands.executeCommand('replrunner.run');
+      await vscode.commands.executeCommand('agentterminal.run');
       assert.ok(createdOptions, 'Should create a new terminal after exit');
       assert.strictEqual(sendCalls, 1, 'Should send command once for new terminal');
     } finally {
@@ -60,7 +62,7 @@ describe('Basic extension checks', function() {
   });
 
   it('workspaceRoot mode uses first folder as cwd', async function() {
-    const cfg = vscode.workspace.getConfiguration('replrunner');
+    const cfg = vscode.workspace.getConfiguration('agentterminal');
     await cfg.update('cwdMode', 'workspaceRoot', vscode.ConfigurationTarget.Workspace);
     await cfg.update('profiles', [
       { id: 'test', label: 'Test REPL', command: 'codex', terminalName: 'Root REPL' }
@@ -84,7 +86,7 @@ describe('Basic extension checks', function() {
     };
 
     try {
-      await vscode.commands.executeCommand('replrunner.run');
+      await vscode.commands.executeCommand('agentterminal.run');
       assert.strictEqual(path.resolve(capturedCwd), path.resolve(folderA));
     } finally {
       vscode.window.createTerminal = originalCreateTerminal;
@@ -92,7 +94,7 @@ describe('Basic extension checks', function() {
   });
 
   it('activeWorkspace mode uses workspace containing active file', async function() {
-    const cfg = vscode.workspace.getConfiguration('replrunner');
+    const cfg = vscode.workspace.getConfiguration('agentterminal');
     await cfg.update('cwdMode', 'activeWorkspace', vscode.ConfigurationTarget.Workspace);
     await cfg.update('profiles', [
       { id: 'test', label: 'Test REPL', command: 'codex', terminalName: 'ActiveWS REPL' }
@@ -120,7 +122,7 @@ describe('Basic extension checks', function() {
     };
 
     try {
-      await vscode.commands.executeCommand('replrunner.run');
+      await vscode.commands.executeCommand('agentterminal.run');
       assert.strictEqual(path.resolve(capturedCwd), path.resolve(folderB));
     } finally {
       vscode.window.createTerminal = originalCreateTerminal;
@@ -128,7 +130,7 @@ describe('Basic extension checks', function() {
   });
 
   it('activeFileDir mode uses directory of active file', async function() {
-    const cfg = vscode.workspace.getConfiguration('replrunner');
+    const cfg = vscode.workspace.getConfiguration('agentterminal');
     await cfg.update('cwdMode', 'activeFileDir', vscode.ConfigurationTarget.Workspace);
     await cfg.update('profiles', [
       { id: 'test', label: 'Test REPL', command: 'codex', terminalName: 'ActiveFileDir REPL' }
@@ -156,7 +158,7 @@ describe('Basic extension checks', function() {
     };
 
     try {
-      await vscode.commands.executeCommand('replrunner.run');
+      await vscode.commands.executeCommand('agentterminal.run');
       assert.strictEqual(path.resolve(capturedCwd), path.dirname(path.resolve(nestedFile)));
     } finally {
       vscode.window.createTerminal = originalCreateTerminal;

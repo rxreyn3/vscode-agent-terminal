@@ -8,13 +8,13 @@ export function activate(context: vscode.ExtensionContext) {
 
   function refreshStatusBar() {
     try {
-      const cfg = vscode.workspace.getConfiguration('replrunner');
+      const cfg = vscode.workspace.getConfiguration('agentterminal');
       const show = cfg.get<boolean>('showStatusBar', false);
       if (show && !statusItem) {
         statusItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, 1000);
-        statusItem.text = '$(terminal) REPL';
-        statusItem.tooltip = 'Run REPL';
-        statusItem.command = 'replrunner.run';
+        statusItem.text = '$(terminal) Agent';
+        statusItem.tooltip = 'Run Agent';
+        statusItem.command = 'agentterminal.run';
         statusItem.show();
         context.subscriptions.push(statusItem);
       } else if (!show && statusItem) {
@@ -24,13 +24,13 @@ export function activate(context: vscode.ExtensionContext) {
         statusItem.show();
       }
     } catch (e: any) {
-      vscode.window.showErrorMessage(`REPL Runner (status bar): ${e?.message || e}`);
+      vscode.window.showErrorMessage(`Agent Terminal (status bar): ${e?.message || e}`);
     }
   }
 
-  const run = vscode.commands.registerCommand('replrunner.run', async () => {
+  const run = vscode.commands.registerCommand('agentterminal.run', async () => {
     try {
-      const cfg = vscode.workspace.getConfiguration('replrunner');
+      const cfg = vscode.workspace.getConfiguration('agentterminal');
       const windowsMode = cfg.get<string>('windowsMode', 'block');
       const mode = cfg.get<string>('cwdMode', 'workspaceRoot');
       const rememberSelection = cfg.get<boolean>('rememberSelection', true);
@@ -50,12 +50,12 @@ export function activate(context: vscode.ExtensionContext) {
       let chosen: Profile | undefined;
       if (!profiles || profiles.length === 0) {
         const choice = await vscode.window.showInformationMessage(
-          'No REPL profiles configured. Open settings to add profiles?',
+          'No Agent Terminal profiles configured. Open settings to add profiles?',
           'Open Settings',
           'Cancel'
         );
         if (choice === 'Open Settings') {
-          try { await vscode.commands.executeCommand('workbench.action.openSettings', 'replrunner'); } catch {}
+          try { await vscode.commands.executeCommand('workbench.action.openSettings', 'agentterminal'); } catch {}
         }
         return;
       } else if (profiles.length === 1) {
@@ -66,7 +66,7 @@ export function activate(context: vscode.ExtensionContext) {
           description: `${p.command}${(p.args && p.args.length) ? ' ' + p.args.join(' ') : ''}`,
           profile: p
         }));
-        const pick = await vscode.window.showQuickPick(picks, { placeHolder: 'Select a REPL profile to run' });
+        const pick = await vscode.window.showQuickPick(picks, { placeHolder: 'Select a profile to run' });
         if (!pick) return;
         chosen = pick.profile;
       }
@@ -77,7 +77,7 @@ export function activate(context: vscode.ExtensionContext) {
       const terminalName = String(chosen.terminalName || `${chosen.label}`).trim();
 
       // Tip: encourage structured args usage
-      const tipKey = 'replrunner.tip.commandHasFlagsShown';
+      const tipKey = 'agentterminal.tip.commandHasFlagsShown';
       const hasFlagsInCommand = /\s+-{1,2}[^\s]/.test(String(command || ''));
       if (hasFlagsInCommand && !context.workspaceState.get(tipKey)) {
         const choice = await vscode.window.showInformationMessage(
@@ -87,13 +87,13 @@ export function activate(context: vscode.ExtensionContext) {
         );
         await context.workspaceState.update(tipKey, true);
         if (choice === 'Open Settings') {
-          try { await vscode.commands.executeCommand('workbench.action.openSettings', 'replrunner'); } catch {}
+          try { await vscode.commands.executeCommand('workbench.action.openSettings', 'agentterminal'); } catch {}
         }
       }
 
       const editor = vscode.window.activeTextEditor;
       const editorUri = editor?.document?.uri;
-      const lastPickedFsPath = context.workspaceState.get<string>('replrunner.lastPickedFsPath');
+      const lastPickedFsPath = context.workspaceState.get<string>('agentterminal.lastPickedFsPath');
       let { cwd, needsPrompt } = resolveCwd({
         mode,
         folders,
@@ -109,14 +109,14 @@ export function activate(context: vscode.ExtensionContext) {
           fsPath: f.uri.fsPath
         }));
         const pick = await vscode.window.showQuickPick(picks, {
-          placeHolder: 'Select workspace folder for REPL Runner'
+          placeHolder: 'Select workspace folder for Agent Terminal'
         });
         if (!pick) {
           return; // user canceled
         }
         cwd = pick.fsPath;
         if (rememberSelection) {
-          await context.workspaceState.update('replrunner.lastPickedFsPath', cwd);
+          await context.workspaceState.update('agentterminal.lastPickedFsPath', cwd);
         }
       }
 
@@ -161,7 +161,7 @@ export function activate(context: vscode.ExtensionContext) {
           args
         } as any);
         if ((decision as any).blocked) {
-          vscode.window.showErrorMessage((decision as any).reason || 'REPL on Windows may be limited. Please use WSL or switch windowsMode.');
+          vscode.window.showErrorMessage((decision as any).reason || 'Agent Terminal on Windows may be limited. Please use WSL or switch windowsMode.');
           return;
         }
         command = (decision as any).commandBase;
@@ -178,7 +178,7 @@ export function activate(context: vscode.ExtensionContext) {
         term.sendText(final, true);
       }
     } catch (err: any) {
-      vscode.window.showErrorMessage(`REPL Runner: ${err?.message || err}`);
+      vscode.window.showErrorMessage(`Agent Terminal: ${err?.message || err}`);
     }
   });
 
@@ -186,7 +186,7 @@ export function activate(context: vscode.ExtensionContext) {
 
   refreshStatusBar();
   const cfgListener = vscode.workspace.onDidChangeConfiguration(e => {
-    if (!e || e.affectsConfiguration('replrunner.showStatusBar') || e.affectsConfiguration('replrunner')) {
+    if (!e || e.affectsConfiguration('agentterminal.showStatusBar') || e.affectsConfiguration('agentterminal')) {
       refreshStatusBar();
     }
   });

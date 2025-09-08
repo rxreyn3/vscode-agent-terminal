@@ -7,11 +7,13 @@ const vscode = require('vscode');
 describe('QuickPick cwd prompt', function() {
   it('prompt mode uses selected folder as cwd and remembers it', async function() {
     // Ensure our extension is activated on demand when the command runs
-    const ext = vscode.extensions.getExtension('local.repl-runner');
+    const pkg = require('../../package.json');
+    const extId = (pkg && pkg.publisher) ? `${pkg.publisher}.${pkg.name}` : `local.${pkg.name}`;
+    const ext = vscode.extensions.getExtension(extId);
     assert.ok(ext, 'Extension should be found');
 
     // Configure the extension for prompt mode and to remember selections
-    const cfg = vscode.workspace.getConfiguration('replrunner');
+    const cfg = vscode.workspace.getConfiguration('agentterminal');
     await cfg.update('cwdMode', 'prompt', vscode.ConfigurationTarget.Workspace);
     await cfg.update('rememberSelection', true, vscode.ConfigurationTarget.Workspace);
     await cfg.update('profiles', [
@@ -49,7 +51,7 @@ describe('QuickPick cwd prompt', function() {
 
     try {
       // Execute the command which should trigger the QuickPick and use folder B as cwd
-      await vscode.commands.executeCommand('replrunner.run');
+      await vscode.commands.executeCommand('agentterminal.run');
 
       assert.strictEqual(quickPickCalls > 0, true, 'QuickPick should be shown');
       assert.strictEqual(path.resolve(capturedCwd), path.resolve(folderB), 'cwd should be folder B');
@@ -61,10 +63,12 @@ describe('QuickPick cwd prompt', function() {
   });
 
   it('uses configured terminalName when creating a terminal', async function() {
-    const ext = vscode.extensions.getExtension('local.repl-runner');
+    const pkg = require('../../package.json');
+    const extId = (pkg && pkg.publisher) ? `${pkg.publisher}.${pkg.name}` : `local.${pkg.name}`;
+    const ext = vscode.extensions.getExtension(extId);
     assert.ok(ext, 'Extension should be found');
 
-    const cfg = vscode.workspace.getConfiguration('replrunner');
+    const cfg = vscode.workspace.getConfiguration('agentterminal');
     await cfg.update('cwdMode', 'workspaceRoot', vscode.ConfigurationTarget.Workspace);
     await cfg.update('profiles', [
       { id: 'test', label: 'Test REPL', command: 'codex', terminalName: 'My REPL' }
@@ -84,7 +88,7 @@ describe('QuickPick cwd prompt', function() {
     };
 
     try {
-      await vscode.commands.executeCommand('replrunner.run');
+      await vscode.commands.executeCommand('agentterminal.run');
       assert.strictEqual(capturedName, 'My REPL');
     } finally {
       vscode.window.createTerminal = originalCreateTerminal;
@@ -92,10 +96,12 @@ describe('QuickPick cwd prompt', function() {
   });
 
   it('reuses existing terminal matching terminalName (no duplicate create)', async function() {
-    const ext = vscode.extensions.getExtension('local.repl-runner');
+    const pkg = require('../../package.json');
+    const extId = (pkg && pkg.publisher) ? `${pkg.publisher}.${pkg.name}` : `local.${pkg.name}`;
+    const ext = vscode.extensions.getExtension(extId);
     assert.ok(ext, 'Extension should be found');
 
-    const cfg = vscode.workspace.getConfiguration('replrunner');
+    const cfg = vscode.workspace.getConfiguration('agentterminal');
     await cfg.update('cwdMode', 'workspaceRoot', vscode.ConfigurationTarget.Workspace);
     await cfg.update('profiles', [
       { id: 'test', label: 'Test REPL', command: 'codex', terminalName: 'Reuse REPL' }
@@ -127,7 +133,7 @@ describe('QuickPick cwd prompt', function() {
     };
 
     try {
-      await vscode.commands.executeCommand('replrunner.run');
+      await vscode.commands.executeCommand('agentterminal.run');
       assert.strictEqual(createCalls, 0, 'Should not create a new terminal when one matches by name');
       assert.ok(showCalls > 0, 'Existing terminal should be shown');
     } finally {
@@ -140,10 +146,12 @@ describe('QuickPick cwd prompt', function() {
   });
 
   it('does not set iconPath by default (uses terminal default)', async function() {
-    const ext = vscode.extensions.getExtension('local.repl-runner');
+    const pkg = require('../../package.json');
+    const extId = (pkg && pkg.publisher) ? `${pkg.publisher}.${pkg.name}` : `local.${pkg.name}`;
+    const ext = vscode.extensions.getExtension(extId);
     assert.ok(ext, 'Extension should be found');
 
-    const cfg = vscode.workspace.getConfiguration('replrunner');
+    const cfg = vscode.workspace.getConfiguration('agentterminal');
     await cfg.update('cwdMode', 'workspaceRoot', vscode.ConfigurationTarget.Workspace);
     await cfg.update('profiles', [
       { id: 'test', label: 'Test REPL', command: 'codex' }
@@ -163,7 +171,7 @@ describe('QuickPick cwd prompt', function() {
     };
 
     try {
-      await vscode.commands.executeCommand('replrunner.run');
+      await vscode.commands.executeCommand('agentterminal.run');
       // By default, no explicit iconPath is set so VS Code uses the
       // built-in terminal icon automatically.
       assert.strictEqual(capturedIcon, undefined, 'iconPath should be undefined to use default terminal icon');

@@ -1,10 +1,10 @@
-REPL Runner
-===========
+Agent Terminal
+==============
 
-A tiny VS Code extension that adds an editor title button to launch a configurable coding REPL in a terminal inside the editor area. Define one or more profiles (e.g., Codex, Claude Code, Gemini CLI, Qwen Code) and pick which to run.
+A tiny VS Code extension that adds an editor title button to launch a configurable agent/REPL in a terminal inside the editor area. Define one or more profiles (e.g., Codex, Claude Code, Gemini CLI, Qwen Code) and pick which to run.
 
 What it does
-- Adds a "Run REPL" terminal button in the editor title bar.
+- Adds a "Run Agent" terminal button in the editor title bar.
 - Opens (or reuses) an editor‑area terminal per profile and runs the selected profile’s command.
 - Focuses the terminal when launching so you can start typing immediately.
 - Handles closed shells gracefully: if the terminal has exited, it is recreated automatically on the next run.
@@ -15,8 +15,8 @@ Requirements
 - Platform support:
   - macOS and Linux: officially supported.
   - Windows: experimental. Prefer running your CLI inside WSL.
-    - To auto-wrap commands with WSL, set `replrunner.windowsMode` to `"wsl"`.
-    - Default behavior is `replrunner.windowsMode: "block"` which shows an error and suggests WSL.
+    - To auto-wrap commands with WSL, set `agentterminal.windowsMode` to `"wsl"`.
+    - Default behavior is `agentterminal.windowsMode: "block"` which shows an error and suggests WSL.
 
 Install / Run (development)
 1) Open this folder in VS Code.
@@ -26,17 +26,17 @@ Install / Run (development)
 
 Usage
 - Editor title button: click the terminal icon in the top‑right when an editor has focus.
-- Command Palette: "REPL: Run REPL" (command id: `replrunner.run`).
+- Command Palette: "Agent: Run Agent" (command id: `agentterminal.run`).
 - Keybinding: `Cmd+Shift+.` (macOS). Customize in Keyboard Shortcuts to suit your OS.
 
 Settings
-- `replrunner.profiles` (array)
+- `agentterminal.profiles` (array)
   - List of REPL profiles to choose from. Each profile has:
     - `id` (string) unique id
     - `label` (string) shown in QuickPick
     - `command` (string) base command to execute
     - `args` (string[], optional) arguments appended after the command
-    - `terminalName` (string, optional) override the terminal’s name; default is `REPL: <label>`
+    - `terminalName` (string, optional) override the terminal’s name; default is `<label>`
     - `icon` (string, optional) icon source: relative path (to the extension), absolute filesystem path, a `file:///...` URI, or a codicon id like `$(zap)`
 
 Verified CLI binaries (suggested commands)
@@ -47,21 +47,21 @@ Verified CLI binaries (suggested commands)
 
 Default profiles
 - The extension seeds four example profiles (Codex, Claude Code, Gemini CLI, Qwen Code) with simple `media/profile-*.svg` icons so tabs are visually distinct. You can replace these with your own assets or use codicon ids (e.g., `$(flame)`).
-- `replrunner.windowsMode` (string, default: `"block"`)
+- `agentterminal.windowsMode` (string, default: `"block"`)
   - Windows handling. `block`: show an error (recommended). `wsl`: invoke via `wsl.exe`. `native`: run as-is (experimental).
-- `replrunner.showStatusBar` (boolean, default: `false`)
-  - Show a status bar action (right side) labeled "REPL" that runs `replrunner.run` from anywhere.
-- `replrunner.cwdMode` (string, default: `"workspaceRoot"`)
+- `agentterminal.showStatusBar` (boolean, default: `false`)
+  - Show a status bar action (right side) labeled "Agent" that runs `agentterminal.run` from anywhere.
+- `agentterminal.cwdMode` (string, default: `"workspaceRoot"`)
   - How to choose the working directory:
     - `workspaceRoot`: use the first workspace folder (default).
     - `activeWorkspace`: use the workspace containing the active editor’s file.
     - `activeFileDir`: use the directory of the active file.
     - `prompt`: when multiple folders are open, prompt to pick one (optionally remembered).
-- `replrunner.rememberSelection` (boolean, default: `true`)
+- `agentterminal.rememberSelection` (boolean, default: `true`)
   - In `prompt` mode, remember the last selected folder and reuse it next time.
 
  Behavior notes
-- Workspace folder: chooses `cwd` per `replrunner.cwdMode`. Without a workspace, the terminal launches in the shell’s default location.
+- Workspace folder: chooses `cwd` per `agentterminal.cwdMode`. Without a workspace, the terminal launches in the shell’s default location.
 - Profiles:
   - 0 profiles → you’ll be prompted to add samples or open settings.
   - 1 profile → runs immediately.
@@ -70,8 +70,8 @@ Default profiles
 - Send behavior: the command is sent only when creating a new terminal; clicking the button again focuses the existing terminal without re-sending. Close the terminal (or type `exit`) to run again.
 - Args assembly: the final command sent is `<command> <quoted args...>` with quoting rules suited to your OS. Put flags in `args` for reliability. Composite items like `-p brain` are tokenized to `-p` and `brain` automatically.
  
-- Windows: you can auto-wrap with WSL (`wsl.exe <command> ...`) when `replrunner.windowsMode` is set to `wsl`. Native Windows support is experimental.
-- Status bar: when enabled via `replrunner.showStatusBar`, the button appears on startup and updates live when toggling the setting.
+- Windows: you can auto-wrap with WSL (`wsl.exe <command> ...`) when `agentterminal.windowsMode` is set to `wsl`. Native Windows support is experimental.
+- Status bar: when enabled via `agentterminal.showStatusBar`, the button appears on startup and updates live when toggling the setting.
 
 Troubleshooting
 - "command not found": Ensure the selected REPL is installed and on your PATH, or set your profile’s `command` to an absolute path.
@@ -87,14 +87,14 @@ Contributing
 - Open issues/PRs are welcome. The code is intentionally minimal; the extension and helpers are written in TypeScript (`src/*.ts`).
 
 Publishing
-- Package locally: `npx vsce package` (or `npm run vscode:package`). This produces `repl-runner-<version>.vsix`.
-- Install locally: `code --install-extension repl-runner-*.vsix`.
+- Package locally: `npx vsce package` (or `npm run vscode:package`). This produces `agent-terminal-<version>.vsix`.
+- Install locally: `code --install-extension agent-terminal-*.vsix`.
 - VS Code Marketplace:
   - Create a Publisher in the VS Code Marketplace and generate an Azure DevOps PAT with scope "Marketplace: Publish".
   - Publish: `npx vsce publish -p $VSCE_TOKEN` (or `npm run vscode:publish` after `vsce login <publisher>`).
 - Open VSX:
   - Create an Open VSX account and token.
-  - Publish: `npx ovsx publish repl-runner-*.vsix -p $OVSX_TOKEN` (or `npm run ovsx:publish`).
+  - Publish: `npx ovsx publish agent-terminal-*.vsix -p $OVSX_TOKEN` (or `npm run ovsx:publish`).
 - CI/CD:
   - Tags matching `v*` trigger `.github/workflows/release.yml`: runs tests, packages, uploads the VSIX artifact, and publishes when `VSCE_TOKEN` and/or `OVSX_TOKEN` secrets are present.
   - Configure repo secrets `VSCE_TOKEN` and `OVSX_TOKEN` to enable publishing.
