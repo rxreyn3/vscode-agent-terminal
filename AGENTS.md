@@ -34,6 +34,7 @@
 - Run (dev): Open in VS Code → Run and Debug → “Run Extension” or press `F5` (preLaunch compiles TypeScript to `out/`).
 - Unit tests: `npm test` (runs resolver, command quoting, and Windows handling tests).
 - Integration tests: `npm run test:integration` (launches VS Code and exercises QuickPick cwd flow).
+- Note (integration tests & sandboxing): Integration tests spawn a VS Code Electron test host. In sandboxed environments (e.g., certain agent runners), this may be blocked (SIGABRT/sandbox errors). Run them locally (outside the sandbox) or grant elevated permissions when prompted.
 - Package: `npm i -g @vscode/vsce && vsce package` → creates `agent-terminal-<version>.vsix`.
 - Install local: `code --install-extension agent-terminal-*.vsix`.
 - Publish (optional): `vsce publish` (requires configured `publisher`).

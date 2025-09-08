@@ -76,6 +76,7 @@ Default profiles
 Troubleshooting
 - "command not found": Ensure the selected REPL is installed and on your PATH, or set your profile’s `command` to an absolute path.
 - No toolbar button: The button only shows when an editor has focus and the extension is active (invoke the command once if needed).
+- Integration tests require a VS Code Electron host; in sandboxed environments these may fail with SIGABRT or sandbox errors. Run `npm run test:integration` locally (outside sandbox) or allow elevated permissions when prompted.
 
 Roadmap (high level)
 - REPL profiles + QuickPick — done.
