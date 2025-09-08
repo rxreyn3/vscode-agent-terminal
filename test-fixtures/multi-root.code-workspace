@@ -6,8 +6,16 @@
   "settings": {
     "codexcli.cwdMode": "activeFileDir",
     "codexcli.rememberSelection": true,
-    "codexcli.precheckBinary": false,
-    "codexcli.terminalName": "ActiveFileDir Codex"
+    "codexcli.terminalName": "ActiveFileDir Codex",
+    "agentterminal.cwdMode": "activeFileDir",
+    "agentterminal.rememberSelection": true,
+    "agentterminal.profiles": [
+      {
+        "id": "test",
+        "label": "Test REPL",
+        "command": "codex",
+        "terminalName": "ActiveFileDir REPL"
+      }
+    ]
   }
 }
-

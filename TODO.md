@@ -2,19 +2,19 @@
 
 ## ~~1) Terminal lifecycle checks~~
 
-- Summary: Reuse the named terminal ("Codex CLI"), but if it has exited, dispose and recreate before sending text. Prevents no-op `sendText` after the shell has terminated (e.g., user typed `exit`).
+- Summary: Reuse the named terminal (profile-specific), but if it has exited, dispose and recreate before sending text. Prevents no-op `sendText` after the shell has terminated (e.g., user typed `exit`).
 
 ## ~~2) Multi-root workspace support~~
 
-- Summary: Choose a smarter `cwd` when multiple folders are open or when the active file lies outside a workspace. Adds a `codexcli.cwdMode` setting to control behavior.
+- Summary: Choose a smarter `cwd` when multiple folders are open or when the active file lies outside a workspace. Adds an `agentterminal.cwdMode` setting to control behavior.
 
-## ~~3) Command robustness (args + PATH precheck)~~
+## 3) Command robustness (args)
 
 - Summary: Support structured arguments and proactively check whether the base binary exists on PATH before running. Provides reliable quoting and early, friendly errors.
 
 ## ~~4) Status bar action~~
 
-- Summary: Optional status bar button to trigger `codexcli.run` from anywhere (not just when an editor has focus).
+- Summary: Optional status bar button to trigger `agentterminal.run` from anywhere (not just when an editor has focus).
 
 ## ~~5) Config schema: terminal name~~
 
@@ -24,7 +24,7 @@
 
 - Summary: Integration tests added to validate command registration, terminal lifecycle handling, and cwd resolution using `@vscode/test-electron` + Mocha.
 - Scope covered:
-  - Verified `codexcli.run` is registered and callable.
+  - Verified `agentterminal.run` is registered and callable.
   - Verified terminal recreation after `exitStatus` is set, and that the command sends once on fresh terminal.
   - Verified cwd resolution for `workspaceRoot`, `activeWorkspace`, and `activeFileDir` against a multi-root workspace fixture.
 - Changes:

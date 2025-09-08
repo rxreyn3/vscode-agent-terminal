@@ -7,7 +7,6 @@ function tryRequire(name: string): any {
 
 // Prefer libraries when available, but keep robust fallbacks so tests and
 // offline environments continue to work.
-const whichLib: any = tryRequire('which');
 const shellQuote: any = tryRequire('shell-quote');
 
 export function quoteArg(arg: unknown, isWindows: boolean): string {
@@ -104,59 +103,9 @@ function isPathLike(base: string): boolean {
   return false;
 }
 
-export function precheckBinary(options: {
-  commandBase?: string;
-  isWindows?: boolean;
-  spawnSync?: (command: string, opts: any) => { status: number | null } | any;
-  fs?: { existsSync?: (p: string) => boolean } | any;
-  which?: { sync?: (cmd: string, opts?: any) => string | null } | any;
-}): { ok: boolean; base: string } {
-  const commandBase = options && options.commandBase ? options.commandBase : '';
-  const isWindows = !!(options && options.isWindows);
-  // eslint-disable-next-line @typescript-eslint/no-var-requires
-  const spawnSync = (options && options.spawnSync) || require('child_process').spawnSync;
-  // eslint-disable-next-line @typescript-eslint/no-var-requires
-  const fs = (options && options.fs) || require('fs');
-  const which = (options && options.which) || whichLib;
-
-  const base = String(commandBase).trim().split(/\s+/)[0] || '';
-  if (!base) {
-    return { ok: false, base };
-  }
-
-  if (isPathLike(base)) {
-    const exists = !!(fs && typeof fs.existsSync === 'function' && fs.existsSync(base));
-    return { ok: exists, base };
-  }
-
-  // Deterministic testing: when a custom spawnSync is provided, use it instead
-  // of the 'which' library to respect injected outcomes.
-  if (options && options.spawnSync) {
-    const check = isWindows ? `where ${base}` : `which ${base}`;
-    const res = spawnSync(check, { shell: true });
-    return { ok: res && res.status === 0, base };
-  }
-
-  // Prefer which library when available, otherwise fallback to shelling out
-  if (which && typeof which.sync === 'function') {
-    try {
-      const resolved = which.sync(base, { nothrow: true });
-      return { ok: !!resolved, base };
-    } catch {
-      return { ok: false, base };
-    }
-  }
-
-  const check = isWindows ? `where ${base}` : `which ${base}`;
-  const res = spawnSync(check, { shell: true });
-  return { ok: res && res.status === 0, base };
-}
-
 export default {
   quoteArg,
   buildFinalCommand,
   quoteArgPosixMinimal,
-  tokenizeArgs,
-  precheckBinary
+  tokenizeArgs
 };
-

@@ -3,6 +3,7 @@
 .github/**
 test/**
 tests/**
+test-fixtures/**
 scripts/**
 docs/**
 coverage/**
@@ -17,4 +18,6 @@ build/**
 # Local analysis and planning docs
 docs/**
 TODO.md
-
+AGENTS.md
+.gitignore
+tsconfig.json

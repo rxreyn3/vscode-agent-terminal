@@ -1,5 +1,11 @@
 'use strict';
 
+// Note: Integration tests spawn a VS Code Electron test host via
+// @vscode/test-electron. In sandboxed environments (e.g., certain agent
+// runners), this may be blocked and result in SIGABRT or sandbox errors.
+// See README.md and AGENTS.md for guidance on running integration tests
+// locally (outside the sandbox) or granting elevated permissions.
+
 const path = require('path');
 const { runTests } = require('@vscode/test-electron');
 

@@ -1,18 +1,18 @@
 {
-  "name": "codex-cli-button",
-  "displayName": "Codex CLI Button",
-  "description": "Adds an editor toolbar button that opens a terminal in the editor area and runs codex-cli.",
+  "name": "agent-terminal",
+  "displayName": "Agent Terminal",
+  "description": "Run a configurable agent/REPL in a terminal in the editor area. Profiles let you choose between multiple CLIs.",
   "version": "0.0.1",
-  "publisher": "local",
+  "publisher": "ryanreynolds",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/rxreyn3/vscode-codex-cli.git"
+    "url": "https://github.com/rxreyn3/vscode-agent-terminal.git"
   },
   "bugs": {
-    "url": "https://github.com/rxreyn3/vscode-codex-cli/issues"
+    "url": "https://github.com/rxreyn3/vscode-agent-terminal/issues"
   },
-  "homepage": "https://github.com/rxreyn3/vscode-codex-cli#readme",
+  "homepage": "https://github.com/rxreyn3/vscode-agent-terminal#readme",
   "engines": {
     "vscode": "^1.75.0"
   },
@@ -20,41 +20,68 @@
     "Other"
   ],
   "keywords": [
+    "agent",
+    "agents",
     "codex",
     "cli",
     "terminal",
+    "repl",
+    "runner",
+    "profiles",
+    "quickpick",
+    "editor-title",
+    "status-bar",
     "toolbar",
     "button",
-    "wsl"
+    "windows",
+    "wsl",
+    "cwd",
+    "workspace",
+    "ai",
+    "claude",
+    "claude-code",
+    "anthropic",
+    "gemini",
+    "google-gemini",
+    "qwen",
+    "qwen-code"
   ],
   "activationEvents": [
-    "onCommand:codexcli.run",
+    "onCommand:agentterminal.run",
     "onStartupFinished"
   ],
   "main": "./out/extension.js",
   "contributes": {
     "configuration": {
-      "title": "Codex CLI Button",
+      "title": "Agent Terminal",
       "properties": {
-        "codexcli.command": {
-          "type": "string",
-          "default": "codex",
-          "markdownDescription": "Base command/binary to run (no flags). Add options in `codexcli.args` for reliable quoting. Example: to run `codex -p brain`, set command to `codex` and set args to either a single item `-p brain` or two items `-p` and `brain`."
-        },
-        "codexcli.args": {
+        "agentterminal.profiles": {
           "type": "array",
-          "default": [],
+          "default": [
+            { "id": "codex", "label": "Codex", "command": "codex", "args": [], "icon": "media/profile-codex.svg" },
+            { "id": "claude", "label": "Claude Code", "command": "claude", "args": [], "icon": "media/profile-claude.svg" },
+            { "id": "gemini", "label": "Gemini CLI", "command": "gemini", "args": [], "icon": "media/profile-gemini.svg" },
+            { "id": "qwen", "label": "Qwen Code", "command": "qwen", "args": [], "icon": "media/profile-qwen.svg" }
+          ],
           "items": {
-            "type": "string"
+            "type": "object",
+            "properties": {
+              "id": { "type": "string" },
+              "label": { "type": "string" },
+              "command": { "type": "string" },
+              "args": {
+                "type": "array",
+                "items": { "type": "string" },
+                "default": []
+              },
+              "terminalName": { "type": "string", "description": "Optional terminal name for this profile; defaults to '<label>'" },
+              "icon": { "type": "string", "description": "Optional icon: relative path (to the extension), absolute filesystem path, URI (e.g., file:///), or codicon id like '$(zap)'." }
+            },
+            "required": ["id", "label", "command"]
           },
-          "markdownDescription": "Optional list of arguments appended after `codexcli.command`. You can add flags and values as two items (e.g. `-p` and `brain`) or as a single item with a space (e.g. `-p brain`). Do not add extra quotes. The extension tokenizes composite items and quotes values appropriately for your platform."
+          "markdownDescription": "List of Agent profiles to choose from. Each profile defines a label, command, and optional args. When more than one profile exists, a QuickPick lets you choose which to run."
         },
-        "codexcli.precheckBinary": {
-          "type": "boolean",
-          "default": true,
-          "markdownDescription": "Best-effort check that the base command exists on PATH (or the given absolute path). Shows an error and skips running when not found."
-        },
-        "codexcli.cwdMode": {
+        "agentterminal.cwdMode": {
           "type": "string",
           "default": "workspaceRoot",
           "enum": [
@@ -65,17 +92,12 @@
           ],
           "markdownDescription": "Working directory mode. `workspaceRoot`: first workspace folder. `activeWorkspace`: workspace containing active file. `activeFileDir`: directory of active file. `prompt`: pick a folder when multiple are open."
         },
-        "codexcli.rememberSelection": {
+        "agentterminal.rememberSelection": {
           "type": "boolean",
           "default": true,
           "description": "When in 'prompt' mode, remember the last selected folder and reuse it."
         },
-        "codexcli.terminalName": {
-          "type": "string",
-          "default": "Codex CLI",
-          "markdownDescription": "Name of the terminal used by Codex CLI Button. Change to customize the label or to run multiple Codex terminals side-by-side. Existing terminals are not renamed."
-        },
-        "codexcli.windowsMode": {
+        "agentterminal.windowsMode": {
           "type": "string",
           "default": "block",
           "enum": [
@@ -83,27 +105,27 @@
             "wsl",
             "native"
           ],
-          "markdownDescription": "Windows handling for Codex CLI. `block`: show an error (recommended). `wsl`: invoke via `wsl.exe` (runs Linux codex inside WSL). `native`: run as-is (experimental; not officially supported)."
+          "markdownDescription": "Windows handling. `block`: show an error (recommended). `wsl`: invoke via `wsl.exe`. `native`: run as-is (experimental)."
         },
-        "codexcli.showStatusBar": {
+        "agentterminal.showStatusBar": {
           "type": "boolean",
           "default": false,
-          "markdownDescription": "Show a status bar action to run Codex from anywhere. When enabled, a right-side Codex button appears and triggers 'codexcli.run'."
+          "markdownDescription": "Show a status bar action to run an Agent from anywhere. When enabled, a right-side button appears and triggers 'agentterminal.run'."
         }
       }
     },
     "commands": [
       {
-        "command": "codexcli.run",
-        "title": "Run Codex CLI",
-        "category": "Codex",
-        "icon": "media/command-icon.svg"
+        "command": "agentterminal.run",
+        "title": "Run Agent",
+        "category": "Agent",
+        "icon": "$(terminal)"
       }
     ],
     "menus": {
       "editor/title": [
         {
-          "command": "codexcli.run",
+          "command": "agentterminal.run",
           "group": "navigation@100",
           "when": "editorTextFocus"
         }
@@ -111,7 +133,7 @@
     },
     "keybindings": [
       {
-        "command": "codexcli.run",
+        "command": "agentterminal.run",
         "key": "cmd+shift+.",
         "when": "editorTextFocus && !terminalFocus"
       }
@@ -143,7 +165,6 @@
     "typescript": "^5.5.4"
   },
   "dependencies": {
-    "shell-quote": "^1.8.3",
-    "which": "^5.0.0"
+    "shell-quote": "^1.8.3"
   }
 }
