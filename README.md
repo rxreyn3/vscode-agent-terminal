@@ -1,13 +1,59 @@
 Agent Terminal
 ==============
 
-A tiny VS Code extension that adds an editor title button to launch a configurable agent/REPL in a terminal inside the editor area. Define one or more profiles (e.g., Codex, Claude Code, Gemini CLI, Qwen Code) and pick which to run.
+Run Agents in the Editor Terminal.
 
-What it does
-- Adds a "Run Agent" terminal button in the editor title bar.
-- Opens (or reuses) an editor‑area terminal per profile and runs the selected profile’s command.
-- Focuses the terminal when launching so you can start typing immediately.
-- Handles closed shells gracefully: if the terminal has exited, it is recreated automatically on the next run.
+- Launch your favorite agent/REPL in an editor‑area terminal.
+- Pick a profile and go. No duplicate sends — the terminal is reused.
+
+Screenshots
+-----------
+
+![Run Agent button](media/feature-run-button.gif)
+![Profile QuickPick](media/feature-profiles.gif)
+![Status bar action](media/feature-statusbar.gif)
+
+Features
+--------
+
+- Editor button + keybinding to launch.
+- Reuses the same terminal; no duplicate commands are sent.
+- QuickPick between multiple profiles (Codex, Claude Code, Gemini, Qwen).
+- Smart cwd modes: workspace root, active workspace/file dir, or prompt.
+- Optional status bar action.
+- Windows: WSL wrapper or block with guidance.
+
+Quick start
+-----------
+
+1) Install the extension.
+2) Open a file and click the terminal icon (or run `Agent: Run Agent`).
+3) If prompted, add a profile in settings.
+
+Customize
+---------
+
+Add or tweak profiles and behavior in settings.json:
+
+```
+{
+  "agentterminal.profiles": [
+    { "id": "codex", "label": "Codex", "command": "codex", "args": ["-p", "brain"] },
+    { "id": "claude", "label": "Claude Code", "command": "claude" }
+  ],
+  "agentterminal.cwdMode": "workspaceRoot",      // workspaceRoot | activeWorkspace | activeFileDir | prompt
+  "agentterminal.rememberSelection": true,        // remember pick in prompt mode
+  "agentterminal.showStatusBar": false,           // adds an "Agent" status bar button
+  "agentterminal.windowsMode": "block"            // block | wsl | native
+}
+```
+
+Tips
+----
+
+- Put flags in `args`, e.g., `"args": ["-p", "profile"]`.
+- Use `terminalName` to control the reusable terminal’s name.
+- Set an icon via codicon (e.g., `"$(zap)"`) or an image path.
 
 Requirements
 - VS Code 1.75+ (engines.vscode ^1.75.0).

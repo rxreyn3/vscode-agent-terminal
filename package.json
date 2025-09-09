@@ -2,7 +2,7 @@
   "name": "agent-terminal",
   "displayName": "Agent Terminal",
   "description": "Run a configurable agent/REPL in a terminal in the editor area. Profiles let you choose between multiple CLIs.",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "publisher": "ryanreynolds",
   "license": "MIT",
   "repository": {
