@@ -2,7 +2,7 @@
   "name": "agent-terminal",
   "displayName": "Agent Terminal",
   "description": "Run a configurable agent/REPL in a terminal in the editor area. Profiles let you choose between multiple CLIs.",
-  "version": "0.0.2",
+  "version": "0.0.6",
   "publisher": "ryanreynolds",
   "license": "MIT",
   "repository": {
@@ -58,26 +58,68 @@
         "agentterminal.profiles": {
           "type": "array",
           "default": [
-            { "id": "codex", "label": "Codex", "command": "codex", "args": [], "icon": "media/profile-codex.svg" },
-            { "id": "claude", "label": "Claude Code", "command": "claude", "args": [], "icon": "media/profile-claude.svg" },
-            { "id": "gemini", "label": "Gemini CLI", "command": "gemini", "args": [], "icon": "media/profile-gemini.svg" },
-            { "id": "qwen", "label": "Qwen Code", "command": "qwen", "args": [], "icon": "media/profile-qwen.svg" }
+            {
+              "id": "codex",
+              "label": "Codex",
+              "command": "codex",
+              "args": [],
+              "icon": "media/profile-codex.svg"
+            },
+            {
+              "id": "claude",
+              "label": "Claude Code",
+              "command": "claude",
+              "args": [],
+              "icon": "media/profile-claude.svg"
+            },
+            {
+              "id": "gemini",
+              "label": "Gemini CLI",
+              "command": "gemini",
+              "args": [],
+              "icon": "media/profile-gemini.svg"
+            },
+            {
+              "id": "qwen",
+              "label": "Qwen Code",
+              "command": "qwen",
+              "args": [],
+              "icon": "media/profile-qwen.svg"
+            }
           ],
           "items": {
             "type": "object",
             "properties": {
-              "id": { "type": "string" },
-              "label": { "type": "string" },
-              "command": { "type": "string" },
+              "id": {
+                "type": "string"
+              },
+              "label": {
+                "type": "string"
+              },
+              "command": {
+                "type": "string"
+              },
               "args": {
                 "type": "array",
-                "items": { "type": "string" },
+                "items": {
+                  "type": "string"
+                },
                 "default": []
               },
-              "terminalName": { "type": "string", "description": "Optional terminal name for this profile; defaults to '<label>'" },
-              "icon": { "type": "string", "description": "Optional icon: relative path (to the extension), absolute filesystem path, URI (e.g., file:///), or codicon id like '$(zap)'." }
+              "terminalName": {
+                "type": "string",
+                "description": "Optional terminal name for this profile; defaults to '<label>'"
+              },
+              "icon": {
+                "type": "string",
+                "description": "Optional icon: relative path (to the extension), absolute filesystem path, URI (e.g., file:///), or codicon id like '$(zap)'."
+              }
             },
-            "required": ["id", "label", "command"]
+            "required": [
+              "id",
+              "label",
+              "command"
+            ]
           },
           "markdownDescription": "List of Agent profiles to choose from. Each profile defines a label, command, and optional args. When more than one profile exists, a QuickPick lets you choose which to run."
         },
